@@ -13,10 +13,13 @@ def add_matrices2D(mat1, mat2):
     for i in range(len(mat1)):
         if len(mat1[i]) != len(mat2[i]):
             return None
-        add = []
+
+    # Ajouter les matrices élément par élément
+    add = []
     for i in range(len(mat1)):
-        row = []
-        for k in range(len(mat2)):
-            row.append(mat1[i][k] + mat2[i][k])
-        add.append(row)
+        row = []  # Initialiser une nouvelle ligne
+        for j in range(len(mat1[i])):
+            row.append(mat1[i][j] + mat2[i][j])  # Ajouter les éléments
+        add.append(row)  # Ajouter la ligne à la matrice de résultats
+
     return add
