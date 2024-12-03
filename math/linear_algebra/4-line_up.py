@@ -3,7 +3,11 @@
 
 
 def add_arrays(arr1, arr2):
-    """ff"""
+    """
+    Args: ff
+    Returns: ff
+    Exemple: ff
+    """
     add = []
     if len(arr1) == len(arr2):
         for i in range(len(arr1)):
