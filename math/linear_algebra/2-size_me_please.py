@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
+"""blabla"""
+
+
 def matrix_shape(matrix):
-    if isinstance(matrix[0], list):
-        if isinstance(matrix[0][0], list):
-            couche = len(matrix)
-            ligne = len(matrix[0])
-            colonne = len(matrix[0][0])
-            return [couche, ligne, colonne]
-        else:
-            ligne = len(matrix)
-            colonne = len(matrix[0])
-            return [ligne, colonne]
-    else:
-        return [len(matrix), 1]
+    """blabla"""
+
+    shape = []
+    while isinstance(matrix, list):  # Vérifier si c'est une list
+        shape.append(len(matrix))  # Ajouter la taille de cette dimension
+        matrix = matrix[0]  # Descendre au niveau inférieur de la matrice
+    return shape
