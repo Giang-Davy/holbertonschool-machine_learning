@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 def matrix_shape(matrix):
     # Vérifier si la matrice est une liste de listes (2D)
     if isinstance(matrix[0], list):
