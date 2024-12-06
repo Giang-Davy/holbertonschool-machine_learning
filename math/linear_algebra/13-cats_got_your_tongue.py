@@ -10,9 +10,4 @@ def np_cat(mat1, mat2, axis=0):
     Args: ff
     Returns: ff
     """
-    if axis == 0:
-        result_0 = np.concatenate((mat1, mat2), axis=0)
-        return result_0
-    if axis == 1:
-        result_1 = np.concatenate((mat1, mat2), axis=1)
-        return result_1
+    return np.concatenate((mat1, mat2), axis=axis)
