@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Génère un graphique de disp poids des hommes"""
+"""Génère un graphique de dispersion de la taille et du poids des hommes"""
 
 
 import numpy as np
@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 def scatter():
     """
-    Génère un graphique de dispersion des données simuléespoids des hommes.
+    Génère un graphique de dispele et le poids des hommes.
     """
     mean = [69, 0]
     cov = [[15, 8], [8, 15]]
@@ -16,8 +16,14 @@ def scatter():
     x, y = np.random.multivariate_normal(mean, cov, 2000).T
     y += 180
     plt.figure(figsize=(6.4, 4.8))
+    plt.xlim([50, 90])  # Ajuste l'échelle de l'axe des x
+    plt.ylim([150, 210])  # Ajuste l'échelle de l'axe des y
     plt.xlabel("Height (in)")
     plt.ylabel("Weight (lbs)")
     plt.title("Men's Height vs Weight")
-    plt.scatter(x, y, color='m', s=7)
+    plt.scatter(x, y, color='m', s=10)  # Ajuste la taille des points
+    plt.savefig('scatter_plot.png', dpi=300)
     plt.show()
+
+
+scatter()
