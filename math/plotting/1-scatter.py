@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Génère un graphi et du poids des hommes"""
+"""Génère un graphique de dispersion de la taille et du poids des hommes"""
 
 
 import numpy as np
@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 def scatter():
     """
-    Génère un graphiqu le poids des hommes.
+    Génère un graphique de dispersion des données simulées pour la taille et le poids des hommes.
     """
     mean = [69, 0]
     cov = [[15, 8], [8, 15]]
