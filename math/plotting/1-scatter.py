@@ -21,6 +21,3 @@ def scatter():
     plt.title("Men's Height vs Weight")
     plt.scatter(x, y, color='m', s=10)  # Ajuste la taille des points
     plt.show()
-
-
-scatter()
