@@ -19,5 +19,5 @@ def scatter():
     plt.xlabel("Height (in)")
     plt.ylabel("Weight (lbs)")
     plt.title("Men's Height vs Weight")
-    plt.scatter(x, y, color='m', s=10)  # Ajuste la taille des points
+    plt.scatter(x, y, color='m', s=7)
     plt.show()
