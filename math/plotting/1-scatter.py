@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Blabla"""
+"""Génère un graphique de disp poids des hommes"""
 
 
 import numpy as np
@@ -8,8 +8,7 @@ import matplotlib.pyplot as plt
 
 def scatter():
     """
-    Args: ff
-    Returns: ff
+    Génère un graphique de dispersion des données simuléespoids des hommes.
     """
     mean = [69, 0]
     cov = [[15, 8], [8, 15]]
@@ -20,7 +19,7 @@ def scatter():
     plt.xlabel("Height (in)")
     plt.ylabel("Weight (lbs)")
     plt.title("Men's Height vs Weight")
-    plt.scatter(x, y, color='m', s=10)
+    plt.scatter(x, y, color='m', s=10)  # Ajuste la taille des points
     plt.show()
 
 
