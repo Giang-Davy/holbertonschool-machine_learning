@@ -18,4 +18,6 @@ def change_scale():
     plt.xlabel('Time (years)')
     plt.ylabel('Fraction Remaining')
     plt.title('Exponential Dacay of C-14')
+    plt.xlim(0, 28650)
+    plt.ylim(0, 1.25)
     plt.show()
