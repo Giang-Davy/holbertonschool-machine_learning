@@ -17,6 +17,7 @@ def all_in_one():
     x0 = np.arange(0, 11)
     plt.plot(x0, y0, color='r', linestyle='-')
     plt.xlim(0, 10)
+    plt.yticks(np.arange(0, 1001, 500))
 
     # Graphique 1
     plt.subplot(3, 2, 2)
@@ -67,6 +68,7 @@ def all_in_one():
     bins = np.arange(0, 101, 10)
     plt.hist(student_grades, bins=bins, edgecolor='black')
     plt.ylim(0, 30)
+    plt.yticks(np.arange(0, 31, 10))
     plt.xlabel('Grades', fontsize='x-small')
     plt.ylabel('Number of Students', fontsize='x-small')
     plt.title('Project A', fontsize='x-small')
