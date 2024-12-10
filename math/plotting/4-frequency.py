@@ -19,6 +19,6 @@ def frequency():
     plt.xlabel('Grades')
     plt.ylabel('Number of Students')
     plt.title('Project A')
-    # Affichage des graduations tous les 10 sur l'axe des x
+    plt.xlim(0, 100)
     plt.xticks(np.arange(0, 101, 10))
     plt.show()
