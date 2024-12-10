@@ -26,6 +26,3 @@ def two():
     plt.xlim(0, 20000)
     plt.ylim(0, 1)
     plt.show()
-
-
-two()
