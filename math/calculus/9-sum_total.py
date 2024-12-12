@@ -6,7 +6,6 @@ def summation_i_squared(n):
     """
     Argsfqsfqs
     """
-    if not isinstance(n, int):
-       return None
-    else:
+    if isinstance(n, int) and n > 0:
         return n * (n + 1) * (2 * n + 1) // 6
+    return None
