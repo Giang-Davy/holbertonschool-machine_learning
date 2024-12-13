@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """blabla"""
 
+
 def poly_integral(poly, C=0):
     """
     Args: poly (list of int or float), C (int or float)
     Returns: list or None
     """
-    if not isinstance(poly, list) or not all(isinstance(j, (int, float)) for j in poly) or not isinstance(C, (int, float)):
+    if not isinstance(poly, list) or not all(
+            isinstance(j, (int, float)) for j in poly) or not isinstance(
+                    C, (int, float)):
         return None
     if not poly:
         return None
