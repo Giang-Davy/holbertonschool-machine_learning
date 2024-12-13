@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""fonction"""
+"""blabla"""
 
 
 def poly_integral(poly, C=0):
@@ -10,15 +10,13 @@ def poly_integral(poly, C=0):
     if not isinstance(poly, list) or not all(
             isinstance(c, (int, float)) for c in poly):
         return None
-    if not isinstance(C, (int, float)):
+    if not isinstance(C, int):
         return None
-
-    integral = [C]
-    for i, coeff in enumerate(poly):
-        if coeff != 0:
-            integral.append(coeff / (i + 1))
-
-    return integral
-
-poly = [5, 3, 0, 1]
-print(poly_integral(poly))
+    integral_poly = [C]
+    for i in range(len(poly)):
+        new_coeff = poly[i] / (i + 1)
+        if new_coeff == int(new_coeff):
+            integral_poly.append(int(new_coeff))
+        else:
+            integral_poly.append(new_coeff)
+    return integral_poly
