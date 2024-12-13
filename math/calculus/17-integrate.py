@@ -7,8 +7,8 @@ def poly_integral(poly, C=0):
     Args: ff
     Returns: ff
     """
-    if not isinstance(poly, list) or not all(
-            isinstance(c, (int, float)) for c in poly):
+    if not (all(isinstance(j, (int, float)) for j in poly) and
+            isinstance(C, int)):
         return None
     integral_poly = [C]
     if len(poly) == 1:
