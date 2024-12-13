@@ -8,16 +8,22 @@ def poly_integral(poly, C=0):
     """
     if not isinstance(poly, list) or not all(isinstance(j, (int, float)) for j in poly) or not isinstance(C, (int, float)):
         return None
+    
+    # Si le polynôme est vide, on retourne une liste vide
+    if not poly:
+        return []
+    
     integral_poly = []
     
-    if C != 0:  # Si C n'est pas zéro, on l'ajoute
+    # Ajouter C seulement s'il est différent de 0
+    if C != 0 or len(poly) > 1:  # Ajouter C seulement si poly a plus d'un terme
         integral_poly.append(C)
     
+    # Calcul de l'intégrale
     for i in range(len(poly)):
         new_coeff = poly[i] / (i + 1)
-        if new_coeff == int(new_coeff):  # Si le coefficient est un entier
+        if new_coeff == int(new_coeff):
             new_coeff = int(new_coeff)
-        if new_coeff != 0 or integral_poly:  # Si ce n'est pas zéro, ou si c'est le premier terme
-            integral_poly.append(new_coeff)
+        integral_poly.append(new_coeff)
     
     return integral_poly
