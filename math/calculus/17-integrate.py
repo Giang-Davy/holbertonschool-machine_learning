@@ -8,20 +8,13 @@ def poly_integral(poly, C=0):
     Returns: ff
     """
     if not isinstance(poly, list) or not all(
-            isinstance(x, (int, float)) for x in poly):
+            isinstance(c, (int, float)) for c in poly):
         return None
-    if not isinstance(C, (int, float)):
-        return None
-
-    integral = [C]
-
+    integral_poly = []
     for i in range(len(poly)):
-        integral.append(poly[i] / (i + 1))
-
-    while len(integral) < len(poly) + 1:
-        integral.append(0)
-
-    integral = [int(x) if isinstance(
-        x, float) and x.is_integer() else x for x in integral]
-
-    return integral
+        new_coeff = poly[i] / (i + 1)
+        if new_coeff == int(new_coeff):
+            integral_poly.append(int(new_coeff))
+        else:
+            integral_poly.append(new_coeff)
+    return integral_poly
