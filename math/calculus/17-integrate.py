@@ -7,7 +7,7 @@ def poly_integral(poly, C=0):
     Returns: list or None
     """
     if not isinstance(poly, list) or not all(isinstance(j, (int, float)) for j in poly) or not isinstance(C, (int, float)):
-        return None
+        return None  # Return None if poly is not a list or C is not a number
     integral_poly = [C]
     if len(poly) == 1:
         if poly == [0]:
