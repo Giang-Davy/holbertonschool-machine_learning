@@ -14,7 +14,7 @@ def poly_integral(poly, C=0):
     for i in range(len(poly)):
         new_coeff = poly[i] / (i + 1)
         if new_coeff == int(new_coeff):
-            integral_poly.append(int(new_coeff))
+            integral_poly.append(int(new_coeff) + C)
         else:
-            integral_poly.append(new_coeff)
+            integral_poly.append(new_coeff + C)
     return integral_poly
