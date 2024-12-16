@@ -67,7 +67,7 @@ class Node:
         if self.right_child:
             node_count += self.right_child.count_nodes_below(only_leaves)
 
-        if not only_leaves or not self.is_leaf:
+        if not only_leaves:
             node_count += 1
 
         return node_count
