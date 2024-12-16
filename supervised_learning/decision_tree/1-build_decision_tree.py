@@ -72,6 +72,7 @@ class Node:
 
         return node_count
 
+
 class Leaf(Node):
     """
     Représente une feuille dans un arbre de décision.
@@ -131,7 +132,7 @@ class Decision_Tree:
         self.min_pop = min_pop
         self.split_criterion = split_criterion
         self.predict = None
-    
+
     def depth(self):
         """
         Calcule la profondeur maximale de l'arbre.
