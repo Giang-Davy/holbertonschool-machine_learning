@@ -6,14 +6,14 @@ import numpy as np
 
 
 class Node:
-    """
-    FFFFF
-    """
     def __init__(self, feature=None, threshold=None, left_child=None,
                  right_child=None, is_root=False, depth=0):
         """
-        Args: ff
-        Returns :ff
+        Calcule la profondeur actuel, y compris
+        les feuilles.
+
+        Retourne :
+            int : la profondeuud.
         """
         self.feature = feature
         self.threshold = threshold
