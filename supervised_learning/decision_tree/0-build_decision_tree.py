@@ -21,7 +21,7 @@ class Node:
         self.depth = depth
 
     def max_depth_below(self) :
-        if self.left is None and self.right_child is None:
+        if self.left_child is None and self.right_child is None:
             return self.depth
         if self.right_child is None:
             return self.right_child.max_depth_below()
