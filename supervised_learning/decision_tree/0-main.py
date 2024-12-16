@@ -31,3 +31,6 @@ def example_1(depth):
     root = level[0]
     root.is_root = True
     return Decision_Tree(root=root)
+
+print(example_0().depth())
+print(example_1(5).depth())
