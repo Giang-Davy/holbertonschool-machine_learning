@@ -101,6 +101,9 @@ class Leaf(Node):
         return self.depth
 
     def count_nodes_below(self, only_leaves=False):
+        """
+        Returns: ff
+        """
         return 1
 
 
@@ -143,4 +146,7 @@ class Decision_Tree:
         return self.root.max_depth_below()
 
     def count_nodes(self, only_leaves=False):
+        """
+        Returns: ff
+        """
         return self.root.count_nodes_below(only_leaves=only_leaves)
