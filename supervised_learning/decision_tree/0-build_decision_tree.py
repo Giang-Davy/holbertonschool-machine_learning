@@ -20,13 +20,13 @@ class Node:
         self.sub_population = None
         self.depth = depth
 
-    def max_depth_below(self) :
+    def max_depth_below(self):
         if self.left_child is None and self.right_child is None:
             return self.depth
         if self.right_child is None:
-            return self.right_child.max_depth_below()
-        if self.left_child is None:
             return self.left_child.max_depth_below()
+        if self.left_child is None:
+            return self.right_child.max_depth_below()
         return 1 + max(self.left_child.max_depth_below(), self.right_child.max_depth_below())
 
 class Leaf(Node):
