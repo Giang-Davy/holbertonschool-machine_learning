@@ -5,6 +5,8 @@ import numpy as np
 
 
 class Node:
+"""FFFFFFF"""
+
     def __init__(self, feature=None, threshold=None, left_child=None,
                  right_child=None, is_root=False, depth=0):
         """
