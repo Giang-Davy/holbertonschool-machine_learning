@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """fonction"""
 
+
 import numpy as np
+
 
 class Node:
     """
@@ -48,7 +50,7 @@ class Node:
     def count_nodes_below(self, only_leaves=False):
         """
         Compte le nombre de noeuds sous ce noeud, en excluant éventuellement
-        les noeuds internes si `only_leaves` est True.
+        les noeuds internes si only_leaves est True.
 
         Args:
             only_leaves (bool): Si True, compter uniquement les feuilles.
@@ -74,29 +76,28 @@ class Node:
         lines = text.split("\n")
         new_text = "    +--" + lines[0] + "\n"
         for x in lines[1:]:
-            new_text += "    |  " + x + "\n"
+            new_text += "    |   " + x + "\n"  # Corrigé le préfixe de barre
         return new_text
 
     def right_child_add_prefix(self, text):
         lines = text.split("\n")
         new_text = "    +--" + lines[0] + "\n"
         for x in lines[1:]:
-            new_text += "    |  " + x + "\n"
+            new_text += "       " + x + "\n"  # Pas de barre verticale ici
         return new_text
 
     def __str__(self):
-        """
-        Retourne une représentation sous forme de chaîne de caractères du noeud.
-
-        Returns:
-            str: Représentation sous forme de chaîne de caractères du noeud.
-        """
-        text = f"node [feature={self.feature}, threshold={self.threshold}]"
-        if self.left_child:
-            text += "\n" + self.left_child_add_prefix(self.left_child.__str__())
-        if self.right_child:
-            text += "\n" + self.right_child_add_prefix(self.right_child.__str__())
-        return text
+        if self.is_leaf:
+            return f"-> leaf [value={self.value}]"
+        left_str = self.left_child.__str__() if self.left_child else ""
+        right_str = self.right_child.__str__() if self.right_child else ""
+        if left_str and right_str:
+            return (f"node [feature={self.feature}, threshold="
+                    f"{self.threshold}]\n"
+                    + self.left_child_add_prefix(left_str)
+                    + self.right_child_add_prefix(right_str))
+        return f"node [feature={self.feature}, threshold={self.threshold}]\n" \
+               + (left_str or right_str)
 
 
 class Leaf(Node):
@@ -109,7 +110,7 @@ class Leaf(Node):
         Initialise une feuille.
 
         Args:
-            value (any): Valeur associée |  cette feuille.
+            value (any): Valeur associée | à cette feuille.
             depth (int, optional): Profondeur de la feuille.
         """
         super().__init__()
@@ -133,12 +134,6 @@ class Leaf(Node):
         return 1
 
     def __str__(self):
-        """
-        Retourne une représentation sous forme de chaîne de caractères de la feuille.
-
-        Returns:
-            str: Représentation sous forme de chaîne de caractères de la feuille.
-        """
         return f"-> leaf [value={self.value}]"
 
 
@@ -187,10 +182,4 @@ class Decision_Tree:
         return self.root.count_nodes_below(only_leaves=only_leaves)
 
     def __str__(self):
-        """
-        Retourne une représentation sous forme de chaîne de caractères de l'arbre de décision.
-
-        Returns:
-            str: Représentation sous forme de chaîne de caractères de l'arbre.
-        """
         return self.root.__str__()
