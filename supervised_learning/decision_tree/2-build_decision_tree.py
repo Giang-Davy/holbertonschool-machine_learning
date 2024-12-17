@@ -74,17 +74,18 @@ class Node:
 
     def left_child_add_prefix(self, text):
         lines = text.split("\n")
-        new_text = "    +--" + lines[0] + "\n"
+        new_text = "\n    +--" + lines[0]  # Préfixe pour le premier n~Sud
         for x in lines[1:]:
-            new_text += "    |   " + x + "\n"  # Corrigé le préfixe de barre
+            new_text += "\n    |   " + x  # Préfixe pour les sous-arbres |  gauche
         return new_text
 
     def right_child_add_prefix(self, text):
         lines = text.split("\n")
-        new_text = "    +--" + lines[0] + "\n"
+        new_text = "\n    +--" + lines[0]  # Préfixe pour le n~Sud droit
         for x in lines[1:]:
-            new_text += "       " + x + "\n"  # Pas de barre verticale ici
+            new_text += "\n       " + x  # Pas de barre ici, uniquement des espaces
         return new_text
+
 
     def __str__(self):
         if self.is_leaf:
@@ -110,7 +111,7 @@ class Leaf(Node):
         Initialise une feuille.
 
         Args:
-            value (any): Valeur associée | à cette feuille.
+            value (any): Valeur associée | |  cette feuille.
             depth (int, optional): Profondeur de la feuille.
         """
         super().__init__()

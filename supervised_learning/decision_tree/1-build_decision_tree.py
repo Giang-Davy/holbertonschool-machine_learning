@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """fonction"""
 
-
 import numpy as np
-
 
 class Node:
     """
@@ -72,6 +70,13 @@ class Node:
 
         return node_count
 
+    def __str__(self):
+        text = f"{'root' if self.is_root else 'node'} [feature={self.feature}, threshold={self.threshold}]"
+        if self.left_child:
+            text += "\n" + left_child_add_prefix(self.left_child.__str__())
+        if self.right_child:
+            text += "\n" + right_child_add_prefix(self.right_child.__str__())
+        return text
 
 class Leaf(Node):
     """
@@ -106,6 +111,8 @@ class Leaf(Node):
         """
         return 1
 
+    def __str__(self):
+        return (f"-> leaf [value={self.value}]")
 
 class Decision_Tree:
     """
@@ -150,3 +157,20 @@ class Decision_Tree:
         Returns: ff
         """
         return self.root.count_nodes_below(only_leaves=only_leaves)
+
+    def __str__(self):
+        return self.root.__str__()
+
+def left_child_add_prefix(text):
+    lines = text.split("\n")
+    new_text = "    +--" + lines[0] + "\n"
+    for x in lines[1:]:
+        new_text += ("    |  " + x) + "\n"
+    return new_text
+
+def right_child_add_prefix(text):
+    lines = text.split("\n")
+    new_text = "    +--" + lines[0] + "\n"
+    for x in lines[1:]:
+        new_text += ("       " + x) + "\n"
+    return new_text
