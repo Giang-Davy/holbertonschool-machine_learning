@@ -5,7 +5,10 @@ import numpy as np
 
 
 class Node:
-    """FFFFFFF"""
+    """
+    Args: ff
+    Returns: ff
+    """
     def __init__(self, feature=None, threshold=None, left_child=None,
                  right_child=None, is_root=False, depth=0):
         """
@@ -37,6 +40,10 @@ class Node:
 
 
 class Leaf(Node):
+    """
+    Args: ff
+    Returns: ff
+    """
     def __init__(self, value, depth=None):
         """
         Args: ff
@@ -63,7 +70,10 @@ class Leaf(Node):
 
 
 class Decision_Tree():
-    """FFFFF"""
+    """
+    Args: ff
+    Returns: ff
+    """
     def __init__(self, max_depth=10, min_pop=1,
                  seed=0, split_criterion="random", root=None):
         """
