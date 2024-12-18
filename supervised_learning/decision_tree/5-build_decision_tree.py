@@ -33,6 +33,9 @@ class Node:
         self.is_root = is_root
         self.sub_population = None
         self.depth = depth
+        self.lower = {}
+        self.upper = {}
+        self.indicator = None
 
     def max_depth_below(self):
         """
@@ -40,13 +43,9 @@ class Node:
         """
         max_depth = self.depth
 
-        # Si le nœud a un enfant gauche, calcule la profondeur maximale sous
-        # l'enfant gauche
         if self.left_child is not None:
             max_depth = max(max_depth, self.left_child.max_depth_below())
 
-        # Si le nœud a un enfant droit, calcule la profondeur maximale sous
-        # l'enfant droit
         if self.right_child is not None:
             max_depth = max(max_depth, self.right_child.max_depth_below())
 
@@ -58,16 +57,12 @@ class Node:
         Optionnellement, compte uniquement les feuilles.
         """
         if only_leaves:
-            # Si seules les feuilles doivent être comptées, saute le comptage
-            # pour les nœuds non-feuilles.
             if self.is_leaf:
                 return 1
             count = 0
         else:
-            # Compte ce nœud si nous ne comptons pas uniquement les feuilles
             count = 1
 
-        # Compte récursivement les nœuds dans les sous-arbres gauche et droit
         if self.left_child is not None:
             count += self.left_child.count_nodes_below(only_leaves)
         if self.right_child is not None:
@@ -115,38 +110,42 @@ class Node:
             self.upper = {0: np.inf}
 
         if self.left_child:
-            # Copie les limites du parent et met à jour
             self.left_child.lower = self.lower.copy()
             self.left_child.upper = self.upper.copy()
 
-            if self.feature in self.left_child.lower:
-                # Met à jour la limite inférieure de l'enfant gauche pour la
-                # caractéristique
-                self.left_child.lower[self.feature] = max(
-                    self.threshold, self.left_child.lower[self.feature]
-                )
-            else:
-                self.left_child.lower[self.feature] = self.threshold
-
-            # Recurse dans l'enfant gauche
+            self.left_child.lower[self.feature] = max(
+                self.threshold, self.left_child.lower.get(self.feature, -np.inf)
+            )
             self.left_child.update_bounds_below()
 
         if self.right_child:
-            # Copie les limites du parent et met à jour
             self.right_child.lower = self.lower.copy()
             self.right_child.upper = self.upper.copy()
 
-            if self.feature in self.right_child.upper:
-                # Met à jour la limite supérieure de l'enfant droit pour la
-                # caractéristique
-                self.right_child.upper[self.feature] = min(
-                    self.threshold, self.right_child.upper[self.feature]
-                )
-            else:
-                self.right_child.upper[self.feature] = self.threshold
-
-            # Recurse dans l'enfant droit
+            self.right_child.upper[self.feature] = min(
+                self.threshold, self.right_child.upper.get(self.feature, np.inf)
+            )
             self.right_child.update_bounds_below()
+
+    def update_indicator(self):
+        """
+        Calcule la fonction indicatrice pour ce nœud en utilisant les bornes inférieures
+        et supérieures pour chaque caractéristique et stocke le résultat dans `self.indicator`.
+        """
+        def is_large_enough(x):
+            return np.all(
+                np.array([x[:, key] >= self.lower[key] for key in self.lower.keys()]),
+                axis=0
+            )
+
+        def is_small_enough(x):
+            return np.all(
+                np.array([x[:, key] <= self.upper[key] for key in self.upper.keys()]),
+                axis=0
+            )
+
+        self.indicator = lambda x: np.all(np.array([is_large_enough(x), is_small_enough(x)]), axis=0)
+
 
 class Leaf(Node):
     """
