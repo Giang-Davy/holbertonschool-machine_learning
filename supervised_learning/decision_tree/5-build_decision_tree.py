@@ -42,13 +42,10 @@ class Node:
         Retourne la profondeur maximale de l'arbre sous ce nœud.
         """
         max_depth = self.depth
-
         if self.left_child is not None:
             max_depth = max(max_depth, self.left_child.max_depth_below())
-
         if self.right_child is not None:
             max_depth = max(max_depth, self.right_child.max_depth_below())
-
         return max_depth
 
     def count_nodes_below(self, only_leaves=False):
@@ -81,11 +78,9 @@ class Node:
         if self.left_child:
             left_str = self.left_child.__str__().replace("\n", "\n    |  ")
             details += f"    +---> {left_str}"
-
         if self.right_child:
             right_str = self.right_child.__str__().replace("\n", "\n       ")
             details += f"\n    +---> {right_str}"
-
         return details
 
     def get_leaves_below(self):
@@ -112,39 +107,48 @@ class Node:
         if self.left_child:
             self.left_child.lower = self.lower.copy()
             self.left_child.upper = self.upper.copy()
-
             self.left_child.lower[self.feature] = max(
-                self.threshold, self.left_child.lower.get(self.feature, -np.inf)
+                self.threshold,
+                self.left_child.lower.get(self.feature, -np.inf)
             )
             self.left_child.update_bounds_below()
 
         if self.right_child:
             self.right_child.lower = self.lower.copy()
             self.right_child.upper = self.upper.copy()
-
             self.right_child.upper[self.feature] = min(
-                self.threshold, self.right_child.upper.get(self.feature, np.inf)
+                self.threshold,
+                self.right_child.upper.get(self.feature, np.inf)
             )
             self.right_child.update_bounds_below()
 
     def update_indicator(self):
         """
-        Calcule la fonction indicatrice pour ce nœud en utilisant les bornes inférieures
-        et supérieures pour chaque caractéristique et stocke le résultat dans `self.indicator`.
+        Calcule la fonction indicatrice poures bornes inférieures
+        et supérieures pour chaque caractéistique et sto
         """
         def is_large_enough(x):
             return np.all(
-                np.array([x[:, key] >= self.lower[key] for key in self.lower.keys()]),
+                np.array([
+                    x[:, key] >= self.lower[key]
+                    for key in self.lower.keys()
+                ]),
                 axis=0
             )
 
         def is_small_enough(x):
             return np.all(
-                np.array([x[:, key] <= self.upper[key] for key in self.upper.keys()]),
+                np.array([
+                    x[:, key] <= self.upper[key]
+                    for key in self.upper.keys()
+                ]),
                 axis=0
             )
 
-        self.indicator = lambda x: np.all(np.array([is_large_enough(x), is_small_enough(x)]), axis=0)
+        self.indicator = lambda x: np.all(
+            np.array([is_large_enough(x), is_small_enough(x)]),
+            axis=0
+        )
 
 
 class Leaf(Node):
