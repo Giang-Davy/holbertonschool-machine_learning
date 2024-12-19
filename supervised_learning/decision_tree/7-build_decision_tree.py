@@ -5,7 +5,7 @@
 import numpy as np
 
 
-def fit(self,explanatory, target,verbose=0) :
+def fit(self, explanatory, target, verbose=0):
     """
     Args: ff
     Returns: ff
