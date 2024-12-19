@@ -1,4 +1,8 @@
+#!/usr/bin/env python3
+
+
 import numpy as np
+
 
 # Affichage des résultats
 print("-" * 52)
