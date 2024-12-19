@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""fonction"""
 
 
 import numpy as np
