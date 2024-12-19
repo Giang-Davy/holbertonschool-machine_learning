@@ -5,7 +5,7 @@
 import numpy as np
 
 
-print("-" * 52)  
+print("-" * 52)
 print("circle of clouds :")
 print("  Training finished.")
 print("    - Depth                     : 10")
