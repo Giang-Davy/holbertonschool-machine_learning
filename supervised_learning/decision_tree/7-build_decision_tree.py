@@ -5,7 +5,14 @@
 import numpy as np
 
 
-# Affichage des résultats
+def fit(self,explanatory, target,verbose=0) :
+    """
+    Args: ff
+    Returns: ff
+    """
+    pass
+
+
 print("-" * 52)
 print("circle of clouds :")
 print("  Training finished.")
