@@ -59,6 +59,18 @@ class Decision_Tree:
     def update_predict(self):
         pass
 
+    def update_bounds(self):
+        # Mise à jour des bornes de l'arbre en fonction de ses noeuds
+        def recursive_update(node):
+            if node.is_leaf:
+                return
+            node.lower[node.feature] = min(node.lower[node.feature], node.threshold)
+            node.upper[node.feature] = max(node.upper[node.feature], node.threshold)
+            recursive_update(node.left_child)
+            recursive_update(node.right_child)
+
+        recursive_update(self.root)
+
     def pred(self, sample):
         return self._predict_sample(sample, self.root)
 
@@ -104,18 +116,15 @@ def random_tree(max_depth, n_classes, n_features, seed=0):
     T = Decision_Tree(root=root)
     build_children(root)
 
-    # Génération de A comme un tableau de taille 100 x n_features
     A = rng.uniform(0, 1, size=100 * n_features).reshape([100, n_features]) * 200 - 100
-
-    # Assure-toi que T et A sont bien renvoyés
     return T, A
 
 
 T, A = random_tree(4, 3, 5, seed=1)
-# L'affichage de l'arbre n'est effectué qu'une seule fois
 print(T)
 
 T.update_predict()
+T.update_bounds()
 
 print("T.pred(A) :\n", np.array([T.pred(x) for x in A]))
 print("T.predict(A) :\n", T.predict(A))
