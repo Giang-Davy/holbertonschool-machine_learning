@@ -89,7 +89,9 @@ class Decision_Tree:
             return self._predict_sample(sample, node.right_child)
 
     def predict(self, X):
-        predictions = [self._predict_sample(sample, self.root) for sample in X]
+        predictions = [
+            self._predict_sample(sample, self.root) for sample in X
+        ]
         return np.array(predictions)
 
     def get_leaves(self):
