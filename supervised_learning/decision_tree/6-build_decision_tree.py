@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
+
 import numpy as np
 
+
 class Node:
-    def __init__(self, feature=None, threshold=None, left_child=None, right_child=None, is_root=False, depth=0):
+    # Classe représentant un nœud dans un arbre de décision
+    def __init__(self, feature=None, threshold=None, left_child=None,
+                 right_child=None, is_root=False, depth=0):
         self.feature = feature
         self.threshold = threshold
         self.left_child = left_child
@@ -11,104 +15,108 @@ class Node:
         self.is_root = is_root
         self.sub_population = None
         self.depth = depth
-
-    def max_depth_below(self):
-        if self.is_leaf:
-            return self.depth
-        left_depth = self.left_child.max_depth_below() if self.left_child else self.depth
-        right_depth = self.right_child.max_depth_below() if self.right_child else self.depth
-        return max(left_depth, right_depth)
+        self.lower = {}
+        self.upper = {}
 
     def __str__(self):
-        result = f"root [feature={self.feature}, threshold={self.threshold}]" if self.is_root else f"node [feature={self.feature}, threshold={self.threshold}]"
+        node_type = "root" if self.is_root else "node"
+        details = f"{node_type} [feature={self.feature}, threshold={self.threshold}]\n"
         if self.left_child:
-            result += "\n" + left_child_add_prefix(self.left_child.__str__())
+            left_str = self.left_child.__str__().replace("\n", "\n    |  ")
+            details += f"    +---> {left_str}"
+
         if self.right_child:
-            result += "\n" + right_child_add_prefix(self.right_child.__str__())
-        return result
+            right_str = self.right_child.__str__().replace("\n", "\n       ")
+            details += f"\n    +---> {right_str}"
 
-    def pred(self, sample):
-        """
-        Prédit la classe pour un seul exemple (un vecteur).
-        """
-        if self.is_leaf:
-            return self.value
-        if sample[self.feature] <= self.threshold:
-            if self.left_child:
-                return self.left_child.pred(sample)
-            else:
-                return self.value  # Valeur par défaut en cas d'absence de sous-arbre
-        else:
-            if self.right_child:
-                return self.right_child.pred(sample)
-            else:
-                return self.value  # Valeur par défaut en cas d'absence de sous-arbr
-    
-def left_child_add_prefix(text):
-    lines = text.split("\n")
-    new_text = "    +---> " + lines[0]
-    for x in lines[1:]:
-        new_text += "\n    |  " + x
-    return new_text
-
-def right_child_add_prefix(text):
-    lines = text.split("\n")
-    new_text = "    +---> " + lines[0]
-    for x in lines[1:]:
-        new_text += "\n       " + x
-    return new_text
+        return details.rstrip()
 
 
 class Leaf(Node):
+    # Classe représentant une feuille dans l'arbre de décision
     def __init__(self, value, depth=None):
         super().__init__()
         self.value = value
         self.is_leaf = True
         self.depth = depth
 
-    def max_depth_below(self):
-        return self.depth
-
     def __str__(self):
-        return f"-> leaf [value={self.value}]"
+        return f"leaf [value={self.value}]"
 
-class Decision_Tree():
+
+class Decision_Tree:
+    # Classe représentant un arbre de décision
     def __init__(self, max_depth=10, min_pop=1, seed=0, split_criterion="random", root=None):
         self.rng = np.random.default_rng(seed)
-        self.root = root if root else Node(is_root=True)
-        self.explanatory = None
-        self.target = None
-        self.max_depth = max_depth
-        self.min_pop = min_pop
-        self.split_criterion = split_criterion
-        self.predict = None
-
-    def depth(self):
-        return self.root.max_depth_below()
+        if root:
+            self.root = root
+        else:
+            self.root = Node(is_root=True)
 
     def __str__(self):
         return self.root.__str__()
 
-    def print_tree(self):
-        tree_str = self.root.__str__()
-        tree_lines = tree_str.splitlines()
-        result = []
-        for line in tree_lines:
-            result.append(line)
-            if line.strip().startswith("root") or line.strip().startswith("node"):
-                result.append("")  # Ajouter un saut de ligne
-        return "\n".join(result).strip()
+    def update_predict(self):
+        pass
 
     def pred(self, sample):
-        """
-        Utilise la méthode 'pred' du noeud pour faire une prédiction sur un exemple (ligne du tableau).
-        """
-        return self.root.pred(sample)
+        return self._predict_sample(sample, self.root)
 
-    def update_predict(self):
-        """
-        Met à jour la fonction de prédiction pour l'ensemble des exemples.
-        """
-        def predict_fn(data):
-            return np.array([self.pred(x) for x in data])
-        self.predict = predict_fn
+    def _predict_sample(self, sample, node):
+        if node.is_leaf:
+            return node.value
+        if sample[node.feature] <= node.threshold:
+            return self._predict_sample(sample, node.left_child)
+        else:
+            return self._predict_sample(sample, node.right_child)
+
+    def predict(self, X):
+        predictions = [self._predict_sample(sample, self.root) for sample in X]
+        return np.array(predictions)
+
+
+def random_tree(max_depth, n_classes, n_features, seed=0):
+    assert max_depth > 0, "max_depth must be a strictly positive integer"
+    rng = np.random.default_rng(seed)
+    root = Node(is_root=True, depth=0)
+    root.lower = {i: -100 for i in range(n_features)}
+    root.upper = {i: 100 for i in range(n_features)}
+
+    def build_children(node):
+    feat = rng.integers(0, n_features)
+    node.feature = feat
+    node.threshold = np.round(rng.uniform(0, 1) * (node.upper[feat] - node.lower[feat]) + node.lower[feat], 2)
+    print(f"Node depth={node.depth}, Feature={node.feature}, Threshold={node.threshold}")  # Ajoute cette ligne
+    if node.depth == max_depth - 1:
+        node.left_child = Leaf(depth=max_depth, value=rng.integers(0, n_classes))
+        node.right_child = Leaf(depth=max_depth, value=rng.integers(0, n_classes))
+    else:
+        node.left_child = Node(depth=node.depth + 1)
+        node.left_child.lower = node.lower.copy()
+        node.left_child.upper = node.upper.copy()
+        node.left_child.lower[feat] = node.threshold
+        node.right_child = Node(depth=node.depth + 1)
+        node.right_child.lower = node.lower.copy()
+        node.right_child.upper = node.upper.copy()
+        node.right_child.upper[feat] = node.threshold
+        build_children(node.left_child)
+        build_children(node.right_child)
+
+    T = Decision_Tree(root=root)
+    build_children(root)
+
+    A = rng.uniform(0, 1, size=100 * n_features).reshape([100, n_features]) * 200 - 100
+    return T, A
+
+
+T, A = random_tree(4, 3, 5, seed=1)
+# L'affichage de l'arbre n'est effectué qu'une seule fois
+print(T)
+
+T.update_predict()
+
+print("T.pred(A) :\n", np.array([T.pred(x) for x in A]))
+print("T.predict(A) :\n", T.predict(A))
+
+test = np.all(np.equal(T.predict(A), np.array([T.pred(x) for x in A])))
+print(f"Predictions are the same on the explanatory array A : {test}")
