@@ -15,8 +15,12 @@ class Node:
         self.is_root = is_root
         self.sub_population = None
         self.depth = depth
-        self.lower = {}
-        self.upper = {}
+        # Initialisation des bornes
+        self.lower = {}  # Les bornes inférieures pour chaque feature
+        self.upper = {}  # Les bornes supérieures pour chaque feature
+        if feature is not None:
+            self.lower[feature] = -100  # Valeur initiale arbitraire
+            self.upper[feature] = 100   # Valeur initiale arbitraire
 
     def __str__(self):
         node_type = "root" if self.is_root else "node"
@@ -64,6 +68,12 @@ class Decision_Tree:
         def recursive_update(node):
             if node.is_leaf:
                 return
+            # Initialisation des bornes pour le feature du nœud
+            if node.feature not in node.lower:
+                node.lower[node.feature] = -100  # Valeur par défaut
+            if node.feature not in node.upper:
+                node.upper[node.feature] = 100  # Valeur par défaut
+            
             node.lower[node.feature] = min(node.lower[node.feature], node.threshold)
             node.upper[node.feature] = max(node.upper[node.feature], node.threshold)
             recursive_update(node.left_child)
