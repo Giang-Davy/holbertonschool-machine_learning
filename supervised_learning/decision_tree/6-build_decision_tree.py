@@ -47,7 +47,6 @@ class Leaf(Node):
     def __str__(self):
         return f"leaf [value={self.value}]"
 
-
 class Decision_Tree:
     # Classe représentant un arbre de décision
     def __init__(self, max_depth=10, min_pop=1, seed=0, split_criterion="random", root=None):
@@ -64,16 +63,13 @@ class Decision_Tree:
         pass
 
     def update_bounds(self):
-        # Mise à jour des bornes de l'arbre en fonction de ses noeuds
         def recursive_update(node):
             if node.is_leaf:
                 return
-            # Initialisation des bornes pour le feature du nœud
             if node.feature not in node.lower:
-                node.lower[node.feature] = -100  # Valeur par défaut
+                node.lower[node.feature] = -100
             if node.feature not in node.upper:
-                node.upper[node.feature] = 100  # Valeur par défaut
-            
+                node.upper[node.feature] = 100
             node.lower[node.feature] = min(node.lower[node.feature], node.threshold)
             node.upper[node.feature] = max(node.upper[node.feature], node.threshold)
             recursive_update(node.left_child)
@@ -96,48 +92,15 @@ class Decision_Tree:
         predictions = [self._predict_sample(sample, self.root) for sample in X]
         return np.array(predictions)
 
+    def get_leaves(self):
+        leaves = []
 
-def random_tree(max_depth, n_classes, n_features, seed=0):
-    assert max_depth > 0, "max_depth must be a strictly positive integer"
-    rng = np.random.default_rng(seed)
-    root = Node(is_root=True, depth=0)
-    root.lower = {i: -100 for i in range(n_features)}
-    root.upper = {i: 100 for i in range(n_features)}
+        def recursive_collect_leaves(node):
+            if node.is_leaf:
+                leaves.append(node)
+                return
+            recursive_collect_leaves(node.left_child)
+            recursive_collect_leaves(node.right_child)
 
-    def build_children(node):
-        feat = rng.integers(0, n_features)
-        node.feature = feat
-        node.threshold = np.round(rng.uniform(0, 1) * (node.upper[feat] - node.lower[feat]) + node.lower[feat], 2)
-        if node.depth == max_depth - 1:
-            node.left_child = Leaf(depth=max_depth, value=rng.integers(0, n_classes))
-            node.right_child = Leaf(depth=max_depth, value=rng.integers(0, n_classes))
-        else:
-            node.left_child = Node(depth=node.depth + 1)
-            node.left_child.lower = node.lower.copy()
-            node.left_child.upper = node.upper.copy()
-            node.left_child.lower[feat] = node.threshold
-            node.right_child = Node(depth=node.depth + 1)
-            node.right_child.lower = node.lower.copy()
-            node.right_child.upper = node.upper.copy()
-            node.right_child.upper[feat] = node.threshold
-            build_children(node.left_child)
-            build_children(node.right_child)
-
-    T = Decision_Tree(root=root)
-    build_children(root)
-
-    A = rng.uniform(0, 1, size=100 * n_features).reshape([100, n_features]) * 200 - 100
-    return T, A
-
-
-T, A = random_tree(4, 3, 5, seed=1)
-print(T)
-
-T.update_predict()
-T.update_bounds()
-
-print("T.pred(A) :\n", np.array([T.pred(x) for x in A]))
-print("T.predict(A) :\n", T.predict(A))
-
-test = np.all(np.equal(T.predict(A), np.array([T.pred(x) for x in A])))
-print(f"Predictions are the same on the explanatory array A : {test}")
+        recursive_collect_leaves(self.root)
+        return leaves
