@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import numpy as np
 
 class Node:
@@ -21,41 +22,27 @@ class Node:
 
     def __str__(self):
         result = f"root [feature={self.feature}, threshold={self.threshold}]" if self.is_root else f"node [feature={self.feature}, threshold={self.threshold}]"
+
         if self.left_child:
             result += "\n" + left_child_add_prefix(self.left_child.__str__())
         if self.right_child:
             result += "\n" + right_child_add_prefix(self.right_child.__str__())
+
         return result
 
-    def pred(self, sample):
-        """
-        Prédit la classe pour un seul exemple (un vecteur).
-        """
-        if self.is_leaf:
-            return self.value
-        if sample[self.feature] <= self.threshold:
-            if self.left_child:
-                return self.left_child.pred(sample)
-            else:
-                return self.value  # Valeur par défaut en cas d'absence de sous-arbre
-        else:
-            if self.right_child:
-                return self.right_child.pred(sample)
-            else:
-                return self.value  # Valeur par défaut en cas d'absence de sous-arbr
-    
+
 def left_child_add_prefix(text):
     lines = text.split("\n")
     new_text = "    +---> " + lines[0]
     for x in lines[1:]:
-        new_text += "\n    |  " + x
+        new_text += "\n    |     " + x
     return new_text
 
 def right_child_add_prefix(text):
     lines = text.split("\n")
     new_text = "    +---> " + lines[0]
     for x in lines[1:]:
-        new_text += "\n       " + x
+        new_text += "\n          " + x
     return new_text
 
 
@@ -71,6 +58,7 @@ class Leaf(Node):
 
     def __str__(self):
         return f"-> leaf [value={self.value}]"
+
 
 class Decision_Tree():
     def __init__(self, max_depth=10, min_pop=1, seed=0, split_criterion="random", root=None):
@@ -92,23 +80,11 @@ class Decision_Tree():
     def print_tree(self):
         tree_str = self.root.__str__()
         tree_lines = tree_str.splitlines()
+
         result = []
         for line in tree_lines:
             result.append(line)
+            # Ajouter un saut de ligne après chaque 'root' ou 'node' pour séparer les groupes
             if line.strip().startswith("root") or line.strip().startswith("node"):
                 result.append("")  # Ajouter un saut de ligne
         return "\n".join(result).strip()
-
-    def pred(self, sample):
-        """
-        Utilise la méthode 'pred' du noeud pour faire une prédiction sur un exemple (ligne du tableau).
-        """
-        return self.root.pred(sample)
-
-    def update_predict(self):
-        """
-        Met à jour la fonction de prédiction pour l'ensemble des exemples.
-        """
-        def predict_fn(data):
-            return np.array([self.pred(x) for x in data])
-        self.predict = predict_fn
