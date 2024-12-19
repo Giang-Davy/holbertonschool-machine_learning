@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""fonction"""
+# Fonction principale, sans documentation
 
 
 import numpy as np
