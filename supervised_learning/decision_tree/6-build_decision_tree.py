@@ -24,7 +24,8 @@ class Node:
 
     def __str__(self):
         node_type = "root" if self.is_root else "node"
-        details = f"{node_type} [feature={self.feature}, threshold={self.threshold}]\n"
+        details = f"{node_type} [feature={self.feature},"
+        details += f"threshold={self.threshold}]\n"
         if self.left_child:
             left_str = self.left_child.__str__().replace("\n", "\n    |  ")
             details += f"    +---> {left_str}"
@@ -47,9 +48,11 @@ class Leaf(Node):
     def __str__(self):
         return f"leaf [value={self.value}]"
 
+
 class Decision_Tree:
     # Classe représentant un arbre de décision
-    def __init__(self, max_depth=10, min_pop=1, seed=0, split_criterion="random", root=None):
+    def __init__(self, max_depth=10, min_pop=1,
+                 seed=0, split_criterion="random", root=None):
         self.rng = np.random.default_rng(seed)
         if root:
             self.root = root
@@ -70,8 +73,10 @@ class Decision_Tree:
                 node.lower[node.feature] = -100
             if node.feature not in node.upper:
                 node.upper[node.feature] = 100
-            node.lower[node.feature] = min(node.lower[node.feature], node.threshold)
-            node.upper[node.feature] = max(node.upper[node.feature], node.threshold)
+            node.lower[node.feature] = min(
+                    node.lower[node.feature], node.threshold)
+            node.upper[node.feature] = max(
+                    node.upper[node.feature], node.threshold)
             recursive_update(node.left_child)
             recursive_update(node.right_child)
 
