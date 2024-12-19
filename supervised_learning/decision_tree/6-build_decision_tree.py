@@ -82,29 +82,32 @@ def random_tree(max_depth, n_classes, n_features, seed=0):
     root.lower = {i: -100 for i in range(n_features)}
     root.upper = {i: 100 for i in range(n_features)}
 
-def build_children(node):
-    feat = rng.integers(0, n_features)
-    node.feature = feat
-    node.threshold = np.round(rng.uniform(0, 1) * (node.upper[feat] - node.lower[feat]) + node.lower[feat], 2)
-    if node.depth == max_depth - 1:
-        node.left_child = Leaf(depth=max_depth, value=rng.integers(0, n_classes))
-        node.right_child = Leaf(depth=max_depth, value=rng.integers(0, n_classes))
-    else:
-        node.left_child = Node(depth=node.depth + 1)
-        node.left_child.lower = node.lower.copy()
-        node.left_child.upper = node.upper.copy()
-        node.left_child.lower[feat] = node.threshold
-        node.right_child = Node(depth=node.depth + 1)
-        node.right_child.lower = node.lower.copy()
-        node.right_child.upper = node.upper.copy()
-        node.right_child.upper[feat] = node.threshold
-        build_children(node.left_child)  # Assurez-vous que cette ligne est indentée correctement
-        build_children(node.right_child)  # Idem ici
+    def build_children(node):
+        feat = rng.integers(0, n_features)
+        node.feature = feat
+        node.threshold = np.round(rng.uniform(0, 1) * (node.upper[feat] - node.lower[feat]) + node.lower[feat], 2)
+        if node.depth == max_depth - 1:
+            node.left_child = Leaf(depth=max_depth, value=rng.integers(0, n_classes))
+            node.right_child = Leaf(depth=max_depth, value=rng.integers(0, n_classes))
+        else:
+            node.left_child = Node(depth=node.depth + 1)
+            node.left_child.lower = node.lower.copy()
+            node.left_child.upper = node.upper.copy()
+            node.left_child.lower[feat] = node.threshold
+            node.right_child = Node(depth=node.depth + 1)
+            node.right_child.lower = node.lower.copy()
+            node.right_child.upper = node.upper.copy()
+            node.right_child.upper[feat] = node.threshold
+            build_children(node.left_child)
+            build_children(node.right_child)
 
     T = Decision_Tree(root=root)
     build_children(root)
 
+    # Génération de A comme un tableau de taille 100 x n_features
     A = rng.uniform(0, 1, size=100 * n_features).reshape([100, n_features]) * 200 - 100
+
+    # Assure-toi que T et A sont bien renvoyés
     return T, A
 
 
