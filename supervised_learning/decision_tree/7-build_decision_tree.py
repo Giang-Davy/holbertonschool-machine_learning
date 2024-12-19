@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-# Fonction principale, sans documentation
+"""
+Module to build and train a decision tree for classification.
+
+This module implements the logic for constructing a decision tree
+and training it on different datasets. It evaluates the tree's
+performance on both training and test data, displaying relevant metrics.
+"""
 
 
 import numpy as np
