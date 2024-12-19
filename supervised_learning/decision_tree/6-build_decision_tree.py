@@ -82,11 +82,10 @@ def random_tree(max_depth, n_classes, n_features, seed=0):
     root.lower = {i: -100 for i in range(n_features)}
     root.upper = {i: 100 for i in range(n_features)}
 
-    def build_children(node):
+def build_children(node):
     feat = rng.integers(0, n_features)
     node.feature = feat
     node.threshold = np.round(rng.uniform(0, 1) * (node.upper[feat] - node.lower[feat]) + node.lower[feat], 2)
-    print(f"Node depth={node.depth}, Feature={node.feature}, Threshold={node.threshold}")  # Ajoute cette ligne
     if node.depth == max_depth - 1:
         node.left_child = Leaf(depth=max_depth, value=rng.integers(0, n_classes))
         node.right_child = Leaf(depth=max_depth, value=rng.integers(0, n_classes))
@@ -99,8 +98,8 @@ def random_tree(max_depth, n_classes, n_features, seed=0):
         node.right_child.lower = node.lower.copy()
         node.right_child.upper = node.upper.copy()
         node.right_child.upper[feat] = node.threshold
-        build_children(node.left_child)
-        build_children(node.right_child)
+        build_children(node.left_child)  # Assurez-vous que cette ligne est indentée correctement
+        build_children(node.right_child)  # Idem ici
 
     T = Decision_Tree(root=root)
     build_children(root)
