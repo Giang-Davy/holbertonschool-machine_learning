@@ -48,6 +48,8 @@ class Decision_Tree:
     def update_predict(self):
         pass
 
+    def accuracy(self, test_explanatory , test_target) :
+        pass
 
 def get_leaf_child(self, node, sub_population):
     leaf_child = Leaf(value)
