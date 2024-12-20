@@ -6,9 +6,13 @@ from sklearn import datasets
 
 
 class Decision_Tree:
-    def __init__(self):
-        # ton code ici
+    def __init__(self, split_criterion="Gini", max_depth=3, seed=0):
+        self.split_criterion = split_criterion
+        self.max_depth = max_depth
+        self.seed = seed
+        # initialise les autres attributs ou méthodes nécessaires
         pass
+
     def Gini_split_criterion_one_feature(self, node, feature):
         pass
 
