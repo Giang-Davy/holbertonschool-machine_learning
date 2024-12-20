@@ -44,6 +44,9 @@ class Decision_Tree:
             node.right_child = self.get_node_child(node, right_population)
             self.fit_node(node.right_child)
             pass
+    
+    def update_predict(self):
+        pass
 
 
 def get_leaf_child(self, node, sub_population):
