@@ -23,32 +23,30 @@ class Decision_Tree:
         pass
     
     def fit_node(self, node):
-    node.feature, node.threshold = self.split_criterion(node)
-
-    left_population = pass  # to be filled
-    right_population = pass  # to be filled
-
+        node.feature, node.threshold = self.split_criterion(node)
+        pass  # to be filled
     # Is left node a leaf?
-    is_left_leaf = pass  # to be filled
+        pass  # to be filled
 
-    if is_left_leaf:
-        node.left_child = self.get_leaf_child(node, left_population)
-    else:
-        node.left_child = self.get_node_child(node, left_population)
-        self.fit_node(node.left_child)
-
+        if is_left_leaf:
+            node.left_child = self.get_leaf_child(node, left_population)
+            pass
+        else:
+            node.left_child = self.get_node_child(node, left_population)
+            self.fit_node(node.left_child)
     # Is right node a leaf?
-    is_right_leaf = pass  # to be filled
+            pass  # to be filled
 
-    if is_right_leaf:
-        node.right_child = self.get_leaf_child(node, right_population)
-    else:
-        node.right_child = self.get_node_child(node, right_population)
-        self.fit_node(node.right_child)
+        if is_right_leaf:
+            node.right_child = self.get_leaf_child(node, right_population)
+            pass
+        else:
+            node.right_child = self.get_node_child(node, right_population)
+            self.fit_node(node.right_child)
+            pass
 
 
 def get_leaf_child(self, node, sub_population):
-    value = pass  # to be filled
     leaf_child = Leaf(value)
     leaf_child.depth = node.depth + 1
     leaf_child.subpopulation = sub_population
@@ -115,7 +113,6 @@ def split(explanatory, target, seed=0, proportion=.1):
     test_indices = rng.choice(target.size, int(target.size * proportion), replace=False)
     test_filter = np.zeros_like(target, dtype="bool")
     test_filter[test_indices] = True
-
     pass  # {"train_explanatory": explanatory[np.logical_not(test_filter), :],
             # "train_target": target[np.logical_not(test_filter)],
             # "test_explanatory": explanatory[test_filter, :],
@@ -147,4 +144,4 @@ print(f"    - Number of nodes           : 21")
 print(f"    - Number of leaves          : 11")
 print(f"    - Accuracy on training data : 1.0")
 print(f"    - Accuracy on test          : 0.9411764705882353")
-print("-" * 52)  # Séparateur après chaque dat
+print("-" * 52)  # Séparateur après chaque d
