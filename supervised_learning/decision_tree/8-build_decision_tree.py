@@ -4,6 +4,14 @@
 import numpy as np
 from sklearn import datasets
 
+class Decision_Tree:
+    def __init__(self, split_criterion="Gini", max_depth=20, seed=0):
+        self.split_criterion = split_criterion
+        self.max_depth = max_depth
+        self.seed = seed
+        self.tree = None
+        self.trained = False
+
 
 def circle_of_clouds(n_clouds, n_objects_by_cloud, radius=1, sigma=None, seed=0, angle=0):
     """
