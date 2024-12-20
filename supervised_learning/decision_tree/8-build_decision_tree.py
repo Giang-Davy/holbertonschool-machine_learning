@@ -9,6 +9,33 @@ class Decision_Tree:
     def __init__(self):
         # ton code ici
         pass
+    def Gini_split_criterion_one_feature(self, node, feature):
+        pass
+
+    def possible_thresholds(self, node, feature):
+        pass
+
+    def Gini_split_criterion(self, node):
+        pass
+
+    def rotate(x, k):
+        pass
+
+    def cloud():
+        pass
+
+    def target():
+        pass
+
+    def iris():
+        pass
+
+    def wine():
+        pass
+
+    def split(explanatory, target, seed=0, proportion=.1):
+        pass
+
 
 #NE PAS TOUCHER
 print("-" * 52)
