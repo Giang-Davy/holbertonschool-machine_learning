@@ -4,149 +4,191 @@
 import numpy as np
 from sklearn import datasets
 
+
+class Node:
+    """
+    Nœud dans un arbre de décision.
+    """
+
+    def __init__(self, feature=None, threshold=None, left_child=None,
+                 right_child=None, is_root=False, depth=0):
+        """
+        Initialise un nœud.
+        """
+        self.feature = feature
+        self.threshold = threshold
+        self.left_child = left_child
+        self.right_child = right_child
+        self.is_leaf = False
+        self.is_root = is_root
+        self.sub_population = None
+        self.depth = depth
+        self.lower = {}
+        self.upper = {}
+        if feature is not None:
+            self.lower[feature] = -100
+            self.upper[feature] = 100
+
+    def __str__(self):
+        """
+        Représentation en chaîne du nœud.
+        """
+        node_type = "root" if self.is_root else "node"
+        details = f"{node_type} [feature={self.feature},"
+        details += f"threshold={self.threshold}]\n"
+        if self.left_child:
+            left_str = self.left_child.__str__().replace("\n", "\n    |  ")
+            details += f"    +---> {left_str}"
+
+        if self.right_child:
+            right_str = self.right_child.__str__().replace("\n", "\n       ")
+            details += f"\n    +---> {right_str}"
+
+        return details.rstrip()
+
+
+class Leaf(Node):
+    """
+    Feuille dans un arbre de décision.
+    """
+
+    def __init__(self, value, depth=None):
+        """
+        Initialise une feuille.
+        """
+        super().__init__()
+        self.value = value
+        self.is_leaf = True
+        self.depth = depth
+
+    def __str__(self):
+        """
+        Représentation en chaîne de la feuille.
+        """
+        return f"leaf [value={self.value}]"
+
+
 class Decision_Tree:
-    def __init__(self, split_criterion="Gini", max_depth=20, seed=0):
-        self.split_criterion = split_criterion
-        self.max_depth = max_depth
-        self.seed = seed
-        self.tree = None
-        self.trained = False
+    """
+    Arbre de décision.
+    """
 
-    def fit(self, X, y, verbose=0):
+    def __init__(self, max_depth=10, min_pop=1,
+                 seed=0, split_criterion="random", root=None):
         """
-        Entraîne l'arbre de décision sur les données X et les étiquettes y.
-        'verbose' permet d'afficher des informations pendant l'entraînement.
+        Initialise l'arbre de décision.
         """
-        # Implémentez ici l'algorithme d'entraînement (par exemple, la division des nœuds, etc.)
-        if verbose > 0:
-            print("Entraînement du modèle sur les données.")
-        pass
-    
-    def fit_node(self, node):
-        node.feature, node.threshold = self.split_criterion(node)
-        pass  # to be filled
-    # Is left node a leaf?
-        pass  # to be filled
-
-        if is_left_leaf:
-            node.left_child = self.get_leaf_child(node, left_population)
-            pass
+        self.rng = np.random.default_rng(seed)
+        if root:
+            self.root = root
         else:
-            node.left_child = self.get_node_child(node, left_population)
-            self.fit_node(node.left_child)
-    # Is right node a leaf?
-            pass  # to be filled
+            self.root = Node(is_root=True)
 
-        if is_right_leaf:
-            node.right_child = self.get_leaf_child(node, right_population)
-            pass
-        else:
-            node.right_child = self.get_node_child(node, right_population)
-            self.fit_node(node.right_child)
-            pass
-    
+    def __str__(self):
+        """
+        Représentation en chaîne de l'arbre de décision.
+        """
+        return self.root.__str__()
+
     def update_predict(self):
+        """
+        Méthode de mise à jour des prédictions (non implémentée).
+        """
         pass
 
-    def accuracy(self, test_explanatory , test_target) :
-        pass
+    def update_bounds(self):
+        """
+        Met à jour les bornes des nœuds.
+        """
+        def recursive_update(node):
+            if node.is_leaf:
+                return
+            if node.feature not in node.lower:
+                node.lower[node.feature] = -100
+            if node.feature not in node.upper:
+                node.upper[node.feature] = 100
+            node.lower[node.feature] = min(
+                    node.lower[node.feature], node.threshold)
+            node.upper[node.feature] = max(
+                    node.upper[node.feature], node.threshold)
+            recursive_update(node.left_child)
+            recursive_update(node.right_child)
 
-def get_leaf_child(self, node, sub_population):
-    leaf_child = Leaf(value)
-    leaf_child.depth = node.depth + 1
-    leaf_child.subpopulation = sub_population
-    pass  # return leaf_child
+        recursive_update(self.root)
 
+    def pred(self, sample):
+        """
+        Prédit la classe d'un échantillon.
+        """
+        return self._predict_sample(sample, self.root)
 
-def get_node_child(self, node, sub_population):
-    n = Node()
-    n.depth = node.depth + 1
-    n.sub_population = sub_population
-    pass  # return n
+    def _predict_sample(self, sample, node):
+        """
+        Prédit la classe pour un échantillon donné à partir d'un nœud.
+        """
+        if node.is_leaf:
+            return node.value
+        if sample[node.feature] <= node.threshold:
+            return self._predict_sample(sample, node.left_child)
+        else:
+            return self._predict_sample(sample, node.right_child)
 
+    def predict(self, X):
+        """
+        Prédit les classes pour un ensemble d'échantillons.
+        """
+        predictions = [
+            self._predict_sample(sample, self.root) for sample in X
+        ]
+        return np.array(predictions)
 
-def accuracy(self, test_explanatory, test_target):
-    pass  # return np.sum(np.equal(self.predict(test_explanatory), test_target)) / test_target.size
+    def get_leaves(self):
+        """
+        Récupère les feuilles de l'arbre.
+        """
+        leaves = []
 
+        def recursive_collect_leaves(node):
+            if node.is_leaf:
+                leaves.append(node)
+                return
+            recursive_collect_leaves(node.left_child)
+            recursive_collect_leaves(node.right_child)
 
+        recursive_collect_leaves(self.root)
+        return leaves
+    
+    def Gini_split_criterion_one_feature(self, node, feature):
+        # Obtenir les seuils possibles
+        thresholds = self.possible_thresholds(node, feature)
+        
+        # Extraire les sous-populations et classes
+        sub_population = node.sub_population
+        values = self.explanatory[sub_population, feature]
+        classes = self.target[sub_population]
+        class_count = len(np.unique(self.target))
+        
+        # Construire le tenseur Left_F
+        Left_F = (values[:, None, None] <= thresholds[None, :, None]) & (classes[:, None, None] == np.arange(class_count)[None, None, :])
+        
+        # Gini impurity pour les left children
+        card_left = Left_F.sum(axis=0)
+        Gini_left = 1 - (card_left**2).sum(axis=1) / (card_left.sum(axis=1)**2 + 1e-9)
+        
+        # Gini impurity pour les right children
+        card_right = (~Left_F).sum(axis=0)
+        Gini_right = 1 - (card_right**2).sum(axis=1) / (card_right.sum(axis=1)**2 + 1e-9)
+        
+        # Calcul de la Gini moyenne
+        total = sub_population.size
+        Gini_avg = (card_left.sum(axis=1) / total) * Gini_left + (card_right.sum(axis=1) / total) * Gini_right
+        
+        # Trouver le seuil avec la plus faible Gini moyenne
+        min_index = np.argmin(Gini_avg)
+        return thresholds[min_index], Gini_avg[min_index]
 
-
-def circle_of_clouds(n_clouds, n_objects_by_cloud, radius=1, sigma=None, seed=0, angle=0):
-    """
-    This function returns a dataset made of 'n_clouds' classes.
-    Each class is a small gaussian cloud containing 'n_objects_by_cloud' points.
-    The centers of the clouds are regularly disposed on a circle of radius 'radius' (and center (0,0)).
-    The spreadth of the clouds is governed by 'sigma'.
-    """
-    rng = np.random.default_rng(seed)
-    if not sigma:
-        sigma = np.sqrt(2 - 2 * np.cos(2 * np.pi / n_clouds)) / 7
-
-    def rotate(x, k):
-        theta = 2 * k * np.pi / n_clouds + angle
-        m = np.matrix([[np.cos(theta), np.sin(theta)], [-np.sin(theta), np.cos(theta)]])
-        pass
-
-    def cloud():
-        pass  # (rng.normal(size=2 * n_objects_by_cloud) * sigma).reshape(n_objects_by_cloud, 2) + np.array([radius, 0])
-
-    def target():
-        pass  # np.array(([[i] * n_objects_by_cloud for i in range(n_clouds)]), dtype="int32").ravel()
-
-    pass  # np.concatenate([np.array(rotate(cloud(), k)) for k in range(n_clouds)], axis=0), target()
-
-
-def iris():
-    """ Returns the explanatory features and the target of the famous iris dataset """
-    iris = datasets.load_iris()
-    pass  # iris.data, iris.target
-
-
-def wine():
-    """ Returns the explanatory features and the target of the wine dataset """
-    wine = datasets.load_wine()
-    pass  # wine.data, wine.target
-
-
-#                                     #########################
-#                                     #    Data preparation   #
-#                                     #########################
-
-def split(explanatory, target, seed=0, proportion=.1):
-    """ Returns a dictionary containing a a training dataset and a test dataset """
-    rng = np.random.default_rng(seed)
-    test_indices = rng.choice(target.size, int(target.size * proportion), replace=False)
-    test_filter = np.zeros_like(target, dtype="bool")
-    test_filter[test_indices] = True
-    pass  # {"train_explanatory": explanatory[np.logical_not(test_filter), :],
-            # "train_target": target[np.logical_not(test_filter)],
-            # "test_explanatory": explanatory[test_filter, :],
-            # "test_target": target[test_filter]}
-
-#NE PAS TOUCHER
-print("-" * 52)
-# Main
-print(f"circle of clouds :")
-print(f"  Training finished.")
-print(f"    - Depth                     : 5")
-print(f"    - Number of nodes           : 19")
-print(f"    - Number of leaves          : 10")
-print(f"    - Accuracy on training data : 1.0")
-print(f"    - Accuracy on test          : 1.0")
-print("-" * 52)
-print(f"iris dataset :")
-print(f"  Training finished.")
-print(f"    - Depth                     : 5")
-print(f"    - Number of nodes           : 13")
-print(f"    - Number of leaves          : 7")
-print(f"    - Accuracy on training data : 1.0")
-print(f"    - Accuracy on test          : 0.9333333333333333")
-print("-" * 52)
-print(f"wine dataset :")
-print(f"  Training finished.")
-print(f"    - Depth                     : 5")
-print(f"    - Number of nodes           : 21")
-print(f"    - Number of leaves          : 11")
-print(f"    - Accuracy on training data : 1.0")
-print(f"    - Accuracy on test          : 0.9411764705882353")
-print("-" * 52)  # Séparateur après chaque d
+    def Gini_split_criterion(self, node):
+        # Calculer pour chaque feature
+        results = np.array([self.Gini_split_criterion_one_feature(node, i) for i in range(self.explanatory.shape[1])])
+        best_feature = np.argmin(results[:, 1])  # Feature avec la plus faible Gini moyenne
+        return best_feature, results[best_feature, 0]
