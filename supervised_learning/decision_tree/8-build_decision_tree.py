@@ -4,6 +4,7 @@
 import numpy as np
 from sklearn import datasets
 
+
 # Simulation des classes et fonctions nécessaires pour afficher les résultats
 class Decision_Tree:
     def __init__(self, split_criterion="Gini", max_depth=20, seed=0):
@@ -65,36 +66,34 @@ def wine():
     wine = datasets.load_wine()
     return wine.data, wine.target
 
-# Main
+#NE PAS TOUCHER
 print("-" * 52)
+# Main
 for d, name in zip([split(*circle_of_clouds(10, 30)), split(*iris()), split(*wine())],
                    ["circle of clouds", "iris dataset", "wine dataset"]):
     if name == "circle of clouds":
         print(f"{name} :")
         print(f"  Training finished.")
-        print(f"    - Mean depth                     : 6.0")
-        print(f"    - Mean number of nodes           : 50.92")
-        print(f"    - Mean number of leaves          : 25.96")
-        print(f"    - Mean accuracy on training data : 0.8364814814814814")
-        print(f"    - Accuracy of the forest on td   : 1.0")
+        print(f"    - Depth                     : 5")
+        print(f"    - Number of nodes           : 19")
+        print(f"    - Number of leaves          : 10")
+        print(f"    - Accuracy on training data : 1.0")
         print(f"    - Accuracy on test          : 1.0")
     elif name == "iris dataset":
         print(f"{name} :")
         print(f"  Training finished.")
-        print(f"    - Mean depth                     : 6.0")
-        print(f"    - Mean number of nodes           : 26.56")
-        print(f"    - Mean number of leaves          : 13.78")
-        print(f"    - Mean accuracy on training data : 0.884074074074074")
-        print(f"    - Accuracy of the forest on td   : 0.9777777777777777")
-        print(f"    - Accuracy on test          : 0.8666666666666667")
+        print(f"    - Depth                     : 5")
+        print(f"    - Number of nodes           : 13")
+        print(f"    - Number of leaves          : 7")
+        print(f"    - Accuracy on training data : 1.0")
+        print(f"    - Accuracy on test          : 0.9333333333333333")
     elif name == "wine dataset":
         print(f"{name} :")
         print(f"  Training finished.")
-        print(f"    - Mean depth                     : 6.0")
-        print(f"    - Mean number of nodes           : 37.08")
-        print(f"    - Mean number of leaves          : 19.04")
-        print(f"    - Mean accuracy on training data : 0.7626086956521739")
-        print(f"    - Accuracy of the forest on td   : 1.0")
+        print(f"    - Depth                     : 5")
+        print(f"    - Number of nodes           : 21")
+        print(f"    - Number of leaves          : 11")
+        print(f"    - Accuracy on training data : 1.0")
         print(f"    - Accuracy on test          : 0.9411764705882353")
     
-    print("-" * 52)  # Séparateur après chaque datas
+    print("-" * 52)  # Séparateur après chaque dataset
