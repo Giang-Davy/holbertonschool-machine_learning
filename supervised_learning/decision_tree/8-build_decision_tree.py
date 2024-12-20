@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 
 
+import numpy as np
+from sklearn import datasets
+
+
+class Decision_Tree:
+    def __init__(self):
+        # ton code ici
+        pass
+
 #NE PAS TOUCHER
 print("-" * 52)
 # Main
