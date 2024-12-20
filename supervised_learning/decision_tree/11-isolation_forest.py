@@ -5,6 +5,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+# 11-isolation_forest.py
+class Isolation_Random_Forest:
+    # Implémentation de la classe
+    def __init__(self):
+        pass
+
+    def train(self, data):
+        # Ton code d'entraînement ici
+        pass
+
+
 print("Training finished.")
 print("    - Mean depth                     : 15.0")
 print("    - Mean number of nodes           : 550.1")
