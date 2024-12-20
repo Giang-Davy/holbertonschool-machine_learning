@@ -5,6 +5,9 @@ import numpy as np
 from sklearn import datasets
 
 class Decision_Tree:
+    def __init__(self, max_depth=10, min_pop=1,
+                 seed=0, split_criterion="random", root=None):
+        pass
     def fit(self,explanatory, target,verbose=0):
         pass
     def np_extrema(self,arr):
