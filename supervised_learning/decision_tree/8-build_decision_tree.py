@@ -12,6 +12,15 @@ class Decision_Tree:
         self.tree = None
         self.trained = False
 
+    def fit(self, X, y, verbose=0):
+        """
+        Entraîne l'arbre de décision sur les données X et les étiquettes y.
+        'verbose' permet d'afficher des informations pendant l'entraînement.
+        """
+        # Implémentez ici l'algorithme d'entraînement (par exemple, la division des nœuds, etc.)
+        if verbose > 0:
+            print("Entraînement du modèle sur les données.")
+        pass
 
 def circle_of_clouds(n_clouds, n_objects_by_cloud, radius=1, sigma=None, seed=0, angle=0):
     """
