@@ -352,7 +352,7 @@ class Decision_Tree():
 
         if verbose == 1:
             # print("----------------------------------------------------")
-            print(f"  Entraînement terminé.")
+            print(f"  Training finished..")
             print(f"    - Depth                     : {self.depth()}")
             print(f"    - Number of nodes           : {self.count_nodes()}")
             print(f"    - Number of leaves          : "
