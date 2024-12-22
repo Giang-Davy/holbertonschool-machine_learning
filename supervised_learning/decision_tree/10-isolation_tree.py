@@ -87,12 +87,7 @@ class Isolation_Random_Tree:
             """
             args:
                 A (np.ndarray): Un tableau NumPy 2D de forme
-                                 (n_individuals, n_features), où chaque ligne
-                                 représente un individu avec ses caractéristiques.
-            returns:
-                np.ndarray: Un tableau NumPy 1D de forme (n_individuals, ),
-                            où chaque élément est la classe prédite
-                            pour l'individu correspondant dans A.
+            returns: ff
             """
             predictions = np.zeros(A.shape[0], dtype=int)
             for i, x in enumerate(A):
@@ -105,10 +100,8 @@ class Isolation_Random_Tree:
 
     def np_extrema(self, arr):
         """
-        args:
-            arr (similaire à un tableau): Tableau dont on veut trouver les extrema.
-        returns:
-            tuple: Valeurs minimale et maximale du tableau.
+        args: ff
+        returns: ff
         """
         return np.min(arr), np.max(arr)
 
@@ -116,8 +109,7 @@ class Isolation_Random_Tree:
         """
         args:
             node (Node): Le noeud à traiter pour la séparation.
-        returns:
-            tuple: L'indice de la caractéristique choisie et la valeur seuil.
+        returns: ff
         """
         diff = 0
         while diff == 0:
@@ -134,7 +126,6 @@ class Isolation_Random_Tree:
         """
         args:
             node (Node): Le noeud parent.
-            sub_population (similaire à un tableau): La sous-population associée.
         returns:
             Leaf: La feuille enfant.
         """
@@ -148,7 +139,6 @@ class Isolation_Random_Tree:
         """
         args:
             node (Node): Le noeud parent.
-            sub_population (similaire à un tableau): La sous-population associée.
         returns:
             Node: Le noeud enfant non-feuille créé.
         """
@@ -166,14 +156,17 @@ class Isolation_Random_Tree:
         """
         node.feature, node.threshold = self.split_criterion(node)
 
-        left_population = node.sub_population & \
-                (self.explanatory[:, node.feature] > node.threshold)
-        right_population = node.sub_population & ~left_population
+        condition = self.explanatory[:, node.feature] > node.threshold
+        left_population = node.sub_population & condition
 
-        is_left_leaf = (node.depth == self.max_depth - 1 or
-                                            np.sum(left_population) <= self.min_pop)
-        is_right_leaf = (node.depth == self.max_depth - 1 or
-                                                 np.sum(right_population) <= self.min_pop)
+        right_population = node.sub_population & ~left_population
+        depth_limit_reached_left = node.depth == self.max_depth - 1
+        left_population_small = np.sum(left_population) <= self.min_pop
+        is_left_leaf = depth_limit_reached_left or left_population_small
+
+        depth_limit_reached_right = node.depth == self.max_depth - 1
+        right_population_small = np.sum(right_population) <= self.min_pop
+        is_right_leaf = depth_limit_reached_right or right_population_small
 
         if is_left_leaf:
             node.left_child = self.get_leaf_child(node, left_population)
