@@ -296,6 +296,7 @@ class Decision_Tree():
         Returns: ff
         """
         return self.root.pred(x)
+
     def pred(self, x):
         """
         Prédit la valeur pour un échantillon en déléguant au nœud racine
