@@ -67,8 +67,12 @@ class Isolation_Random_Forest():
         depths = self.predict(explanatory)
         suspect_indices = np.argsort(depths)[:n_suspects]
         
-        # Affichage formaté pour les suspects et leurs profondeurs
-        print(f"suspects : {explanatory[suspect_indices]}")
+        # Affichage des suspects dans un format multi-lignes
+        print(f"suspects :")
+        for suspect in explanatory[suspect_indices]:
+            print(f" {suspect}")
+        
+        # Affichage des profondeurs dans un format classique
         print(f"depths of suspects : {depths[suspect_indices]}")
         
         return explanatory[suspect_indices], depths[suspect_indices]
