@@ -1,145 +1,239 @@
 #!/usr/bin/env python3
-"""Task 9: 9. Random forests"""
+""" Tâche 10"""
+
+
 import numpy as np
-from scipy import stats
-Decision_Tree = __import__('8-build_decision_tree').Decision_Tree
+Node = __import__('8-build_decision_tree').Node
+Leaf = __import__('8-build_decision_tree').Leaf
 
 
-class Random_Forest:
+class Isolation_Random_Tree:
     """
-    Random_Forest class implements a random forest algorithm which
-    builds a large list of decision trees with random splitting criteria.
-
-    Attributes:
-    n_trees : int
-        Number of trees in the forest.
-    max_depth : int
-        Maximum depth of the trees.
-    min_pop : int
-        Minimum population at a node for it to split.
-    seed : int
-        Seed for random number generation.
-    numpy_preds : list
-        List of prediction functions from each tree.
-    target : array-like
-        Target variable used during training.
-    explanatory : array-like
-        Explanatory variables used during training.
-
-    Methods:
-    __init__(self, n_trees=100, max_depth=10, min_pop=1, seed=0):
-        Initializes the Random_Forest with the specified parameters.
-
-    predict(self, explanatory):
-        Predicts the class labels for the given explanatory
-        data based on the majority vote of all trees.
-
-    fit(self, explanatory, target, n_trees=100, verbose=0):
-        Trains the Random_Forest on the given explanatory and
-        target data by building decision trees.
-
-    accuracy(self, test_explanatory, test_target):
-        Calculates the accuracy of the Random_Forest on test data.
+    La classe Isolation_Random_Tree implémente un
+    arbre d'isolation pour détecter les valeurs aberrantes.
     """
 
-    def __init__(self, n_trees=100, max_depth=10, min_pop=1, seed=0):
+    def __init__(self, max_depth=10, seed=0, root=None):
         """
-        Initializes the Random_Forest with specified parameters.
-
-        Parameters:
-        n_trees : int, optional
-            Number of trees in the forest (default is 100).
-        max_depth : int, optional
-            Maximum depth of the trees (default is 10).
-        min_pop : int, optional
-            Minimum population at a node for it to split (default is 1).
-        seed : int, optional
-            Seed for random number generation (default is 0).
+        max_depth : int, optionnel
+                Profondeur maximale de l'arbre (par défaut 10).
+        seed : int, optionnel
+                Graine pour la génération de nombres aléatoires (par défaut 0).
+        root : Node ou Leaf, optionnel
         """
-        self.numpy_predicts = []
-        self.target = None
-        self.numpy_preds = None
-        self.n_trees = n_trees
+        self.rng = np.random.default_rng(seed)
+        self.root = root if root else Node(is_root=True)
+        self.explanatory = None
         self.max_depth = max_depth
-        self.min_pop = min_pop
-        self.seed = seed
+        self.predict = None
+        self.min_pop = 1
 
-    def predict(self, explanatory):
+    def __str__(self):
         """
-        Predicts the class labels for the given explanatory data.
+        Retourne une représentation en chaîne de l'arbre de décision.
 
-        Parameters:
-        explanatory : array-like
-            Explanatory variables for which predictions are required.
-
-        Returns:
-        array-like
-            Predicted class labels.
+        Retourne :
+        str
+                La représentation en chaîne de l'arbre de décision.
         """
-        all_preds = []
-        for tree_predict in self.numpy_preds:
-            preds = tree_predict(explanatory)
-            all_preds.append(preds)
-        all_preds = np.array(all_preds)
-        mode_preds = stats.mode(all_preds, axis=0)[0]
-        return mode_preds.flatten()
+        return self.root.__str__() + "\n"
 
-    def fit(self, explanatory, target, n_trees=100, verbose=0):
+    def depth(self):
         """
-        Trains the Random_Forest on the given explanatory and target data.
+        Retourne la profondeur maximale de l'arbre.
 
-        Parameters:
-        explanatory : array-like
-            Explanatory variables used for training.
-        target : array-like
-            Target variable used for training.
-        n_trees : int, optional
-            Number of trees in the forest (default is 100).
-        verbose : int, optional
-            If set to 1, prints training statistics (default is 0).
+        Retourne :
+        int
+                La profondeur maximale de l'arbre.
         """
-        self.target = target
+        return self.root.max_depth_below()
+
+    def count_nodes(self, only_leaves=False):
+        """
+        Compte le nombre de noeuds dans l'arbre de décision.
+
+        Paramètres :
+        only_leaves : bool, optionnel
+
+        Retourne :
+        int
+                Le nombre de noeuds dans l'arbre.
+        """
+        return self.root.count_nodes_below(only_leaves=only_leaves)
+
+    def update_bounds(self):
+        """
+        Met à jour les limites pour l'ensemble
+        de l'arbre en partant du noeud racine.
+        """
+        self.root.update_bounds_below()
+
+    def get_leaves(self):
+        """
+        Retourne une liste de toutes les feuilles de l'arbre.
+
+        Retourne :
+        list
+                La liste de toutes les feuilles de l'arbre.
+        """
+        return self.root.get_leaves_below()
+
+    def update_predict(self):
+        """
+        Met à jour la fonction de prédiction pour l'arbre de décision.
+        """
+        self.update_bounds()
+        leaves = self.get_leaves()
+        for leaf in leaves:
+            leaf.update_indicator()
+
+        def predict(A):
+            """
+            Prédit la classe pour chaque individu dans le
+            tableau d'entrée A en utilisant l'arbre de décision.
+
+            Paramètres :
+            A : np.ndarray
+                    Un tableau NumPy 2D de forme (n_individuals,
+                    n_features), où chaque ligne
+                    représente un individu avec ses caractéristiques.
+
+            Retourne :
+            np.ndarray
+                    Un tableau NumPy 1D de forme (n_individuals,),
+                    où chaque élément est la classe prédite
+                    pour l'individu correspondant dans A.
+            """
+            predictions = np.zeros(A.shape[0], dtype=int)
+            for i, x in enumerate(A):
+                for leaf in leaves:
+                    if leaf.indicator(np.array([x])):
+                        predictions[i] = leaf.value
+                        break
+            return predictions
+        self.predict = predict
+
+    def np_extrema(self, arr):
+        """
+        Retourne les valeurs minimale et maximale d'un tableau.
+
+        Paramètres :
+        arr : similaire à un tableau
+                Tableau dont on veut trouver les extrema.
+
+        Retourne :
+        tuple
+                Valeurs minimale et maximale du tableau.
+        """
+        return np.min(arr), np.max(arr)
+
+    def random_split_criterion(self, node):
+        """
+
+        Paramètres
+        node : Node
+
+        Retourne
+        tuple
+        """
+        diff = 0
+        while diff == 0:
+            feature = self.rng.integers(0, self.explanatory.shape[1])
+            feature_min, feature_max = self.np_extrema(
+                    self.explanatory[:, feature][node.sub_population]
+            )
+            diff = feature_max - feature_min
+        x = self.rng.uniform()
+        threshold = (1 - x) * feature_min + x * feature_max
+        return feature, threshold
+
+    def get_leaf_child(self, node, sub_population):
+        """
+
+        Paramètres :
+        node : Node
+                Le noeud parent.
+        sub_population : similaire à un tableau
+
+        Retourne :
+        Leaf
+        """
+        value = node.depth + 1
+        leaf_child = Leaf(value)
+        leaf_child.depth = node.depth + 1
+        leaf_child.subpopulation = sub_population
+        return leaf_child
+
+    def get_node_child(self, node, sub_population):
+        """
+        Crée un noeud enfant non-feuille.
+
+        Paramètres
+        node : Node
+                Le noeud parent.
+        sub_population : similaire à un tableau
+                La sous-population pour le noeud enfant.
+
+        Retourne :
+        Node
+                Le noeud enfant non-feuille créé.
+        """
+        n = Node()
+        n.depth = node.depth + 1
+        n.sub_population = sub_population
+        return n
+
+    def fit_node(self, node):
+        """
+
+        Paramètres :
+        node : Node
+                Le noeud à ajuster.
+        """
+
+        node.feature, node.threshold = self.split_criterion(node)
+
+        left_population = node.sub_population & \
+                (self.explanatory[:, node.feature] > node.threshold)
+        right_population = node.sub_population & ~left_population
+
+        is_left_leaf = (node.depth == self.max_depth - 1 or
+                                            np.sum(left_population) <= self.min_pop)
+        is_right_leaf = (node.depth == self.max_depth - 1 or
+                                                 np.sum(right_population) <= self.min_pop)
+
+        if is_left_leaf:
+            node.left_child = self.get_leaf_child(node, left_population)
+        else:
+            node.left_child = self.get_node_child(node, left_population)
+            node.left_child.depth = node.depth + 1
+            self.fit_node(node.left_child)
+
+        if is_right_leaf:
+            node.right_child = self.get_leaf_child(node, right_population)
+        else:
+            node.right_child = self.get_node_child(node, right_population)
+            node.right_child.depth = node.depth + 1
+            self.fit_node(node.right_child)
+
+    def fit(self, explanatory, verbose=0):
+        """
+
+        Paramètres :
+        explanatory : similaire à un tableau
+                Variables explicatives utilisées pour l'entraînement.
+        verbose : int, optionnel
+                Si défini à 1, imprime les statistiques de l'entraînement (par défaut 0).
+        """
+        self.split_criterion = self.random_split_criterion
         self.explanatory = explanatory
-        self.numpy_preds = []
-        depths = []
-        nodes = []
-        leaves = []
-        accuracies = []
-        for i in range(n_trees):
-            T = Decision_Tree(max_depth=self.max_depth,
-                              min_pop=self.min_pop, seed=self.seed + i)
-            T.fit(explanatory, target)
-            self.numpy_preds.append(T.predict)
-            depths.append(T.depth())
-            nodes.append(T.count_nodes())
-            leaves.append(T.count_nodes(only_leaves=True))
-            accuracies.append(T.accuracy(T.explanatory, T.target))
+        self.root.sub_population = np.ones(explanatory.shape[0], dtype='bool')
+
+        self.fit_node(self.root)
+        self.update_predict()
+
         if verbose == 1:
-            print(f"""  Training finished.
-    - Mean depth                     : {np.array(depths).mean()}
-    - Mean number of nodes           : {np.array(nodes).mean()}
-    - Mean number of leaves          : {np.array(leaves).mean()}
-    - Mean accuracy on training data : {np.array(accuracies).mean()}""")
-            print(f"    - Accuracy of the forest on td   : "
-                  f"{self.accuracy(self.explanatory, self.target)}")
-
-    def accuracy(self, test_explanatory, test_target):
-        """
-        Calculates the accuracy of the Random_Forest on test data.
-
-        Accuracy is calculated as the proportion of correctly predicted
-        labels out of the total labels.
-
-        Parameters:
-        test_explanatory : array-like
-            Explanatory variables of the test data.
-        test_target : array-like
-            True target labels of the test data.
-
-        Returns:
-        float
-            Accuracy of the Random_Forest on the test data.
-        """
-
-        return np.sum(np.equal(self.predict(test_explanatory),
-                               test_target)) / test_target.size
+            print(f"""  Entraînement terminé.
+    - Profondeur                : {self.depth()}
+    - Nombre de noeuds          : {self.count_nodes()}
+    - Nombre de feuilles        : {self.count_nodes(only_leaves=True)}""")
