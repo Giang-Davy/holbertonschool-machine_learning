@@ -353,11 +353,11 @@ class Decision_Tree():
         if verbose == 1:
             # print("----------------------------------------------------")
             print(f"  Entraînement terminé.")
-            print(f"    - Profondeur                : {self.depth()}")
-            print(f"    - Nombre de nœuds          : {self.count_nodes()}")
-            print(f"    - Nombre de feuilles        : "
+            print(f"    - Depth                     : {self.depth()}")
+            print(f"    - Number of nodes           : {self.count_nodes()}")
+            print(f"    - Number of leaves          : "
                   f"{self.count_nodes(only_leaves=True)}")
-            print(f"    - Précision sur les données : "
+            print(f"    - Accuracy on training data : "
                   f"{self.accuracy(self.explanatory, self.target)}")
             # print("----------------------------------------------------")
 
