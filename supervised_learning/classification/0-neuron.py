@@ -6,6 +6,9 @@ import numpy as np
 
 
 class Neuron:
+    """
+    Class qui represente les neuronnes
+    """
     def __init__(self, nx):
         """
         Args: ff
