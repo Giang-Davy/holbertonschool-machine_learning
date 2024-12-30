@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""fonction"""
 
 
 import numpy as np
@@ -23,12 +24,15 @@ class Neuron:
 
     @property
     def W(self):
+        """getter function"""
         return self._W
     
     @property
     def b(self):
+        """getter function"""
         return self._b
     
     @property
     def A(self):
+        """getter function"""
         return self._A
