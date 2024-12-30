@@ -26,12 +26,12 @@ class Neuron:
     def W(self):
         """getter function"""
         return self._W
-    
+
     @property
     def b(self):
         """getter function"""
         return self._b
-    
+
     @property
     def A(self):
         """getter function"""
