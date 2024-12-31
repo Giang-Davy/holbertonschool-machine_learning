@@ -19,7 +19,7 @@ class Neuron:
         if nx < 1:
             raise ValueError("nx must be a positive")
         self._W = np.random.randn(1, nx)
-        self._b = 0
+        self._b = 1
         self._A = 0
 
     @property
