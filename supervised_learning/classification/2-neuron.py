@@ -36,7 +36,7 @@ class Neuron:
     def A(self):
         """getter function"""
         return self._A
-    
+
     def forward_prop(self, X):
         """ffland"""
         Z = np.dot(self._W, X) + self._b
