@@ -73,9 +73,8 @@ class Neuron:
         self._W -= alpha * dW
         self._b -= alpha * db
 
-    def train(self, X, Y, A, iterations=5000, alpha=0.05):
-        """Entrainement du neurone"""
-        m = Y.shape[1]
+    def train(self, X, Y, iterations=5000, alpha=0.05):
+        """Entraîne le neurone"""
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
         if iterations <= 0:
@@ -84,7 +83,12 @@ class Neuron:
             raise TypeError("alpha must be a float")
         if alpha <= 0:
             raise ValueError("alpha must be positive")
+
         for _ in range(iterations):
+            # Propagation avant pour calculer A
             A = self.forward_prop(X)
+            # Descente de gradient pour mettre à jour les poids et le biais
             self.gradient_descent(X, Y, A, alpha)
+
+        # Retourne les prédictions et le coût final après l'entraînement
         return self.evaluate(X, Y)
