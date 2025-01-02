@@ -50,13 +50,13 @@ class Neuron:
         Z = np.dot(self._W, X) + self._b
         self._A = 1 / (1 + np.exp(-Z))
         return self._A
-    
+
     def cost(self, Y, A):
         """ffland2"""
         m = Y.shape[1]
         cost = -np.sum(Y * np.log(A) + (1 - Y) * np.log(1.0000001 - A)) / m
         return cost
-    
+
     def evaluate(self, X, Y):
         """evaluer A et prédire"""
         A = self.forward_prop(X)
