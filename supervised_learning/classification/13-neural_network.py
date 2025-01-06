@@ -77,23 +77,24 @@ class NeuralNetwork:
         return predictions, cost
 
     def gradient_descent(self, X, Y, A1, A2, alpha=0.05):
-        """Descente de gradient pour mettre à jour W et b"""
+        """descente"""
         m = Y.shape[1]
 
-        # Calcul des dérivées pour la couche de sortie
         dZ2 = A2 - Y
         dW2 = np.dot(dZ2, A1.T) / m
         db2 = np.sum(dZ2, axis=1, keepdims=True) / m
 
-        # Mise à jour des paramètres de la deuxième couche
-        self.__W2 -= alpha * dW2
-        self.__b2 -= alpha * db2
-
-        # Calcul des dérivées pour la première couche
         dZ1 = np.dot(self.__W2.T, dZ2) * (A1 * (1 - A1))
         dW1 = np.dot(dZ1, X.T) / m
         db1 = np.sum(dZ1, axis=1, keepdims=True) / m
 
-        # Mise à jour des paramètres de la première couche
+        self.__W2 -= alpha * dW2
+        self.__b2 -= alpha * db2
         self.__W1 -= alpha * dW1
         self.__b1 -= alpha * db1
+
+        # Arrondir pour limiter les erreurs de précision
+        self.__W2 = np.round(self.__W2, decimals=8)
+        self.__b2 = np.round(self.__b2, decimals=8)
+        self.__W1 = np.round(self.__W1, decimals=8)
+        self.__b1 = np.round(self.__b1, decimals=8)
