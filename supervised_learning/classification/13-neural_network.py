@@ -4,6 +4,9 @@
 import numpy as np
 
 
+np.random.seed(42)
+
+
 class NeuralNetwork:
     """Réseau neuronne"""
     def __init__(self, nx, nodes):
