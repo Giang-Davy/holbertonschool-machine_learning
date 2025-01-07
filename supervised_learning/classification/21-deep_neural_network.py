@@ -73,25 +73,27 @@ class DeepNeuralNetwork:
         return predictions, cost
 
     def gradient_descent(self, Y, cache, alpha=0.05):
-        """Effectue une passe de descente de gradient."""
-        m = Y.shape[1]  # Nombre d'exemples
+        """Effectue une passe de descente de gradient"""
+        m = Y.shape[1]
+        L = self.__L
 
-        # Initialisation des dérivées
-        dA = cache[f'A{self.__L}'] - Y
+        # Calcul de dZ pour la dernière couche
+        dZ = cache[f'A{L}'] - Y
 
-        for i in range(self.__L, 0, -1):
-            A_prev = cache[f'A{i - 1}'] if i > 1 else cache['A0']
-            
-            # Calcul de dZ en appliquant la dérivée de la sigmoïde
-            dZ = dA * cache[f'A{i}'] * (1 - cache[f'A{i}'])
-            
+        # Rétropropagation à travers toutes les couches
+        for index_couche in range(L, 0, -1):
+            # Récupération des activations de la couche précédente
+            A_prev = cache[f'A{index_couche-1}']
+
             # Calcul des gradients
-            dW = (1 / m) * np.dot(dZ, A_prev.T)
+            dW = (1 / m) * np.matmul(dZ, A_prev.T)
             db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)
 
-            # Mise à jour des poids
-            self.__weights[f'W{i}'] -= alpha * dW
-            self.__weights[f'b{i}'] -= alpha * db
-            
-            # Mise à jour de dA pour la prochaine couche
-            dA = np.dot(self.__weights[f'W{i}'].T, dZ)
+            if index_couche > 1:
+                # Calcul de dZ pour la couche précédente
+                W = self.__weights[f'W{index_couche}']
+                dZ = np.matmul(W.T, dZ) * (A_prev * (1 - A_prev))
+
+            # Mise à jour des poids et biais
+            self.__weights[f'W{index_couche}'] -= alpha * dW
+            self.__weights[f'b{index_couche}'] -= alpha * db
