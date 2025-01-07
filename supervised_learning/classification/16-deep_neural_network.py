@@ -4,11 +4,10 @@
 
 import numpy as np
 
-
 class DeepNeuralNetwork:
-    """réseau neuronne profond"""
+
     def __init__(self, nx, layers):
-        """initialisation"""
+
         if not isinstance(nx, int):
             raise TypeError("nx must be an integer")
         if nx < 1:
@@ -17,9 +16,8 @@ class DeepNeuralNetwork:
             raise TypeError("layers must be a list of positive integers")
 
         # Vérification de layers sans boucle explicite ou implicite
-        for layer in layers:
-            if not isinstance(layer, int) or layer <= 0:
-                raise TypeError("layers must be a list of positive integers")
+        if any(not isinstance(layer, int) or layer <= 0 for layer in layers):
+            raise TypeError("layers must be a list of positive integers")
 
         self.L = len(layers)
         self.cache = {}
