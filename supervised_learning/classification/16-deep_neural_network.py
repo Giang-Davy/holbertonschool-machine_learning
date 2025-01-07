@@ -5,9 +5,9 @@
 import numpy as np
 
 class DeepNeuralNetwork:
-
+    
     def __init__(self, nx, layers):
-
+        
         if not isinstance(nx, int):
             raise TypeError("nx must be an integer")
         if nx < 1:
@@ -15,8 +15,8 @@ class DeepNeuralNetwork:
         if not isinstance(layers, list) or len(layers) == 0:
             raise TypeError("layers must be a list of positive integers")
 
-        # Vérification de layers sans boucle explicite ou implicite
-        if any(not isinstance(layer, int) or layer <= 0 for layer in layers):
+        # Vérification de layers avec la condition fournie
+        if len(layers) != sum(isinstance(layer, int) and layer > 0 for layer in layers):
             raise TypeError("layers must be a list of positive integers")
 
         self.L = len(layers)
