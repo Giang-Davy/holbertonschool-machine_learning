@@ -5,6 +5,9 @@
 import numpy as np
 
 
+np.random.seed(42)
+
+
 class DeepNeuralNetwork:
     """réseau neuronne profond"""
     def __init__(self, nx, layers):
