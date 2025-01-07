@@ -28,15 +28,17 @@ class DeepNeuralNetwork:
             )
             self.__weights[f"b{i + 1}"] = np.zeros((layers[i], 1))
 
-        @property
+    @property
     def L(self):
         """getter"""
         return self.__L
+
     @property
     def cache(self):
         """getter"""
         return self.__cache
+
     @property
-    def weight(self):
+    def weights(self):
         """getter"""
-        return self.__weight
+        return self.__weights
