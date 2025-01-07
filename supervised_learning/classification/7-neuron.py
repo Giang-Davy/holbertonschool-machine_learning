@@ -19,24 +19,24 @@ class Neuron:
             raise TypeError("nx must be a integer")
         if nx < 1:
             raise ValueError("nx must be a positive")
-        self._W = np.random.randn(1, nx)
-        self._b = 0
-        self._A = 0
+        self.__W = np.random.randn(1, nx)
+        self.__b = 0
+        self.__A = 0
 
     @property
     def W(self):
         """getter function"""
-        return self._W
+        return self.__W
 
     @property
     def b(self):
         """getter function"""
-        return self._b
+        return self.__b
 
     @property
     def A(self):
         """getter function"""
-        return self._A
+        return self.__A
 
     def forward_prop(self, X):
         """
@@ -48,12 +48,12 @@ class Neuron:
         Returns:
             Activation (A): sortie activée du neurone
         """
-        Z = np.dot(self._W, X) + self._b
-        self._A = 1 / (1 + np.exp(-Z))
-        return self._A
+        Z = np.dot(self.__W, X) + self.__b
+        self.__A = 1 / (1 + np.exp(-Z))
+        return self.__A
 
     def cost(self, Y, A):
-        """ffland2"""
+        """coût"""
         m = Y.shape[1]
         cost = -np.sum(Y * np.log(A) + (1 - Y) * np.log(1.0000001 - A)) / m
         return cost
@@ -71,8 +71,8 @@ class Neuron:
         dZ = A - Y
         dW = np.dot(dZ, X.T) / m
         db = np.sum(dZ) / m
-        self._W -= alpha * dW
-        self._b -= alpha * db
+        self.__W -= alpha * dW
+        self.__b -= alpha * db
 
     def train(self, X, Y, iterations=5000, alpha=0.05, verbose=True, graph=True, step=100):
         """Entraîne le neurone"""
@@ -98,11 +98,14 @@ class Neuron:
             self.gradient_descent(X, Y, A, alpha)
 
             # Enregistrer le coût tous les 'step' itérations
-            if i % step == 0 or i == iterations - 1:  # Inclure la dernière itération
+            if i % step == 0 or i == iterations - 1:
                 cost = self.cost(Y, A)
                 costs.append(cost)
                 if verbose:
-                    print(f"Cost after {i} iterations: {cost}")
+                    iteration_display = i + 1 if i == iterations - 1 else i
+                    print(f"Cost after {iteration_display} iterations: {cost}")
+
+            
 
         # Graphique si demandé
         if graph:
