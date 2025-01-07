@@ -5,7 +5,7 @@
 import numpy as np
 
 
-np.random.seed(42)
+np.random.seed(42)  # Fixer la graine pour des résultats reproductibles
 
 
 class DeepNeuralNetwork:
@@ -81,9 +81,17 @@ class DeepNeuralNetwork:
 
         for i in range(self.__L, 0, -1):
             A_prev = cache[f'A{i - 1}'] if i > 1 else cache['A0']
-            dZ = dA * (cache[f'A{i}'] * (1 - cache[f'A{i}']))
+            
+            # Calcul de dZ en appliquant la dérivée de la sigmoïde
+            dZ = dA * cache[f'A{i}'] * (1 - cache[f'A{i}'])
+            
+            # Calcul des gradients
             dW = (1 / m) * np.dot(dZ, A_prev.T)
             db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)
+
+            # Mise à jour des poids
             self.__weights[f'W{i}'] -= alpha * dW
             self.__weights[f'b{i}'] -= alpha * db
+            
+            # Mise à jour de dA pour la prochaine couche
             dA = np.dot(self.__weights[f'W{i}'].T, dZ)
