@@ -27,3 +27,16 @@ class DeepNeuralNetwork:
                 np.random.randn(layers[i], prev) * np.sqrt(2 / prev)
             )
             self.__weights[f"b{i + 1}"] = np.zeros((layers[i], 1))
+
+        @property
+    def L(self):
+        """getter"""
+        return self.__L
+    @property
+    def cache(self):
+        """getter"""
+        return self.__cache
+    @property
+    def weight(self):
+        """getter"""
+        return self.__weight
