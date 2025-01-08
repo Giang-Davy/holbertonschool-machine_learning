@@ -6,7 +6,7 @@ import numpy as np
 
 
 def one_hot_decode(one_hot):
-    """ff"""
+    """fonction"""
     # Vérification de la validité de l'entrée
     if not isinstance(one_hot, np.ndarray) or one_hot.ndim != 2:
         return None
