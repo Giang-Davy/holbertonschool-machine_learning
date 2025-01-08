@@ -1,78 +1,165 @@
 #!/usr/bin/env python3
-"""fonction"""
+"""
+Module définissant un réseau de neurones profond
+pour la classification binaire.
+"""
 
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 
-np.random.seed(42)
 
 class DeepNeuralNetwork:
-    """réseau neuronne profond"""
+    """
+    Classe définissant un réseau de neurones profond
+    pour la classification binaire.
+
+    Attributs privés :
+        __L (int): Nombre de couches dans le réseau de neurones.
+        __cache (dict): Dictionnaire pour stocker les valeurs intermédiaires.
+        __weights (dict): Dictionnaire pour stocker les poids
+        et biais du réseau de neurones.
+    """
+
     def __init__(self, nx, layers):
-        """initialisation"""
+        """
+        Initialise un réseau de neurones profond.
+
+        Args:
+            nx (int): Nombre de caractéristiques d'entrée.
+            layers (list): Liste contenant le nombre de nœuds
+            pour chaque couche du réseau.
+
+        Raises:
+            TypeError: Si nx n'est pas un entier.
+            ValueError: Si nx est inférieur à 1.
+            TypeError: Si layers n'est pas une liste de nombres positifs.
+        """
+        # Vérifications des paramètres
         if not isinstance(nx, int):
             raise TypeError("nx must be an integer")
         if nx < 1:
             raise ValueError("nx must be a positive integer")
         if not isinstance(layers, list) or len(layers) == 0:
             raise TypeError("layers must be a list of positive integers")
-        if min(layers) < 1:
-            raise TypeError("layers must be a list of positive integers")
+
         self.__L = len(layers)
         self.__cache = {}
         self.__weights = {}
 
+        # Initialisation des poids et biais
         for i in range(self.__L):
-            prev = nx if i == 0 else layers[i - 1]
-            self.__weights[f"W{i + 1}"] = (
-                np.random.randn(layers[i], prev) * np.sqrt(2 / prev)
-            )
-            self.__weights[f"b{i + 1}"] = np.zeros((layers[i], 1))
+            layer_num = i + 1
+            if not isinstance(layers[i], int) or layers[i] < 1:
+                raise TypeError("layers must be a list of positive integers")
+
+            if i == 0:
+                self.__weights[f'W{layer_num}'] = (
+                    np.random.randn(layers[i], nx) * np.sqrt(2 / nx)
+                )
+            else:
+                self.__weights[f'W{layer_num}'] = (np.random.randn(
+                    layers[i], layers[i - 1]) * np.sqrt(2 / layers[i - 1]))
+            self.__weights[f'b{layer_num}'] = np.zeros((layers[i], 1))
 
     @property
     def L(self):
-        """getter"""
+        """Retourne le nombre de couches du réseau de neurones."""
         return self.__L
 
     @property
     def cache(self):
-        """getter"""
+        """Retourne le dictionnaire de cache du réseau de neurones."""
         return self.__cache
 
     @property
     def weights(self):
-        """getter"""
+        """Retourne le dictionnaire des poids et biais
+        du réseau de neurones."""
         return self.__weights
 
     def forward_prop(self, X):
-        """Propagation avant du réseau de neurones."""
+        """
+        Calcule la propagation avant du réseau de neurones
+
+        Args:
+            X (numpy.ndarray): données d'entrée de forme (nx, m)
+                nx est le nombre de caractéristiques
+                m est le nombre d'exemples
+
+        Returns:
+            tuple: (sortie du réseau, cache)
+        """
         self.__cache['A0'] = X
 
-        A = X
-        for i in range(1, self.__L + 1):
-            Z = np.dot(self.__weights[f'W{i}'], A) + self.__weights[f'b{i}']
-            A = 1 / (1 + np.exp(-Z))
-            self.__cache[f'A{i}'] = A
+        for index_couche in range(1, self.__L + 1):
+            W = self.__weights[f'W{index_couche}']
+            b = self.__weights[f'b{index_couche}']
+            A_prev = self.__cache[f'A{index_couche-1}']
 
-        return A, self.__cache
+            Z = np.matmul(W, A_prev) + b
+            self.__cache[f'A{index_couche}'] = 1 / (1 + np.exp(-Z))
+
+        return self.__cache[f'A{self.__L}'], self.__cache
 
     def cost(self, Y, A):
-        """fonction coût"""
+        """
+        Calcule le coût du modèle avec la régression logistique
+
+        Args:
+            Y (numpy.ndarray): étiquettes correctes de forme (1, m)
+            A (numpy.ndarray): sortie activée du réseau de forme (1, m)
+
+        Returns:
+            float: Le coût
+        """
         m = Y.shape[1]
-        cost = -np.sum(Y * np.log(A) + (1 - Y) * np.log(1.0000001 - A)) / m
+        cost = -(1 / m) * np.sum(
+            Y * np.log(A) + (1 - Y) * np.log(1.0000001 - A)
+        )
         return cost
 
     def evaluate(self, X, Y):
-        """Évalue les prédictions du réseau de neurones et calcule le coût"""
+        """
+        Évalue les prédictions du réseau de neurones
+
+        Args:
+            X (numpy.ndarray): données d'entrée de forme (nx, m)
+                nx est le nombre de caractéristiques
+                m est le nombre d'exemples
+            Y (numpy.ndarray): étiquettes correctes de forme (1, m)
+
+        Returns:
+            tuple: (prédictions, coût)
+                prédictions est une matrice de forme (1, m)
+                coût est un scalaire
+        """
+        # Propagation avant pour obtenir les prédictions
         A, _ = self.forward_prop(X)
-        predictions = np.where(A >= 0.5, 1, 0)
+
+        # Calcul du coût
         cost = self.cost(Y, A)
+
+        # Conversion des probabilités en prédictions binaires
+        predictions = np.where(A >= 0.5, 1, 0)
 
         return predictions, cost
 
     def gradient_descent(self, Y, cache, alpha=0.05):
-        """Effectue une passe de descente de gradient"""
+        """
+        Calcule une passe de descente de gradient sur le réseau de neurones
+
+        Args:
+            Y (numpy.ndarray): étiquettes correctes de forme (1, m)
+            cache (dict): dictionnaire contenant toutes les valeurs
+                         intermédiaires du réseau
+            alpha (float): taux d'apprentissage
+        Lexique perso:
+        'd' représente la dérivée partielle
+                'Z' représente la sortie avant l'activation
+                Par convention 'dZ' représente la dérivée de
+        la fonction de coût par rapport à Z
+        """
         m = Y.shape[1]
         L = self.__L
 
@@ -99,7 +186,21 @@ class DeepNeuralNetwork:
 
     def train(self, X, Y, iterations=5000, alpha=0.05,
               verbose=True, graph=True, step=100):
-        """Entraîne le neurone"""
+        """
+        Entraîne le réseau de neurones profond
+
+        Args:
+            X (numpy.ndarray): données d'entrée de forme (nx, m)
+            Y (numpy.ndarray): étiquettes correctes de forme (1, m)
+            iterations (int): nombre d'itérations d'entraînement
+            alpha (float): taux d'apprentissage
+            verbose (bool): affiche le coût pendant l'entraînement
+            graph (bool): affiche le graphique d'apprentissage
+            step (int): pas entre les affichages
+
+        Returns:
+            tuple: (prédictions finales, coût final)
+        """
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
         if iterations <= 0:
@@ -108,38 +209,40 @@ class DeepNeuralNetwork:
             raise TypeError("alpha must be a float")
         if alpha <= 0:
             raise ValueError("alpha must be positive")
-        if not isinstance(step, int):
-            raise TypeError("step must be an integer")
-        if step <= 0 or step > iterations:
-            raise ValueError("step must be positive and <= iterations")
+        if verbose or graph:
+            if not isinstance(step, int):
+                raise TypeError("step must be an integer")
+            if step <= 0 or step > iterations:
+                raise ValueError("step must be positive and <= iterations")
 
         costs = []
+        steps = []
 
-        for i in range(iterations):
-            # Propagation avant pour calculer A
-            A, _ = self.forward_prop(X)
-            # Descente de gradient pour mettre à jour les poids et le biais
-            self.gradient_descent(Y, self.cache, alpha)
+        for i in range(iterations + 1):
+            # Propagation avant
+            A, cache = self.forward_prop(X)
 
-            # Enregistrer le coût tous les 'step' itérations
-            if i % step == 0 or i == iterations - 1:
+            # Affichage du coût
+            if i % step == 0 or i == iterations:
                 cost = self.cost(Y, A)
                 costs.append(cost)
+                steps.append(i)
                 if verbose:
-                    iteration_display = i + 1 if i == iterations - 1 else i
-                    print(f"Cost after {iteration_display} iterations: {cost}")
+                    print(f"Cost after {i} iterations: {cost}")
 
-        # Graphique si demandé
+            if i < iterations:
+                # Descente de gradient
+                self.gradient_descent(Y, cache, alpha)
+
+        # Affichage du graphique
         if graph:
-            plt.plot(range(0, iterations + 1, step), costs, color="blue")
-            plt.xlabel("iteration")
-            plt.ylabel("cost")
-            plt.title("Training Cost")
+            plt.plot(steps, costs, 'b-')
+            plt.xlabel('iteration')
+            plt.ylabel('cost')
+            plt.title('Training Cost')
             plt.show()
 
-        # Retourne les prédictions et le coût final
-        predictions, cost = self.evaluate(X, Y)
-        return predictions, cost
+        return self.evaluate(X, Y)
 
     def save(self, filename):
         """
