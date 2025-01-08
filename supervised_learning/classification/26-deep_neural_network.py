@@ -148,22 +148,12 @@ class DeepNeuralNetwork:
         """Sauvegarde l'instance de l'objet dans un fichier au format pickle"""
         if not filename.endswith('.pkl'):
             filename += '.pkl'
-        try:
-            with open(filename, 'wb') as f:
-                pickle.dump(self, f)
-        except Exception as e:
-            print(f"Erreur lors de la sauvegarde : {e}")
+        with open(filename, 'wb') as f:
+            pickle.dump(self, f)
 
     @staticmethod
     def load(filename):
         """Charge un objet DeepNeuralNetwork depuis un fichier pickle"""
-        try:
-            with open(filename, 'rb') as f:
-                loaded_object = pickle.load(f)
-            return loaded_object
-        except FileNotFoundError:
-            print(f"Le fichier {filename} n'existe pas.")
-            return None
-        except Exception as e:
-            print(f"Erreur lors du chargement : {e}")
-            return None
+        with open(filename, 'rb') as f:
+            loaded_object = pickle.load(f)
+        return loaded_object
