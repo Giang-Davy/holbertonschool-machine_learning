@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 """fonction"""
 
-
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 
-
 np.random.seed(42)
-
 
 class DeepNeuralNetwork:
     """réseau neuronne profond"""
@@ -20,7 +17,7 @@ class DeepNeuralNetwork:
             raise ValueError("nx must be a positive integer")
         if not isinstance(layers, list) or len(layers) == 0:
             raise TypeError("layers must be a list of positive integers")
-        if min(layers) < 0:
+        if min(layers) < 1:
             raise TypeError("layers must be a list of positive integers")
         self.__L = len(layers)
         self.__cache = {}
@@ -61,7 +58,7 @@ class DeepNeuralNetwork:
         return A, self.__cache
 
     def cost(self, Y, A):
-        """fonnction coût"""
+        """fonction coût"""
         m = Y.shape[1]
         cost = -np.sum(Y * np.log(A) + (1 - Y) * np.log(1.0000001 - A)) / m
         return cost
@@ -100,8 +97,8 @@ class DeepNeuralNetwork:
             self.__weights[f'W{index_couche}'] -= alpha * dW
             self.__weights[f'b{index_couche}'] -= alpha * db
 
-    def train(self, X, Y, iterations=5000,
-              alpha=0.05, verbose=True, graph=True, step=100):
+    def train(self, X, Y, iterations=5000, alpha=0.05,
+              verbose=True, graph=True, step=100):
         """Entraîne le neurone"""
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
