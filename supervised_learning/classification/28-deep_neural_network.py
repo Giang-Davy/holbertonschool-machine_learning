@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-"""
-module
-"""
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
@@ -12,12 +6,12 @@ import pickle
 class DeepNeuralNetwork:
     """
     Classe DeepNeuralNetwork qui définit un réseau de neurones profond
-    réalisant une classification binaire avec des fonctions d'activation configurables
+    réalisant une classification binaire [..]
     """
 
     def __init__(self, nx, layers, activation='sig'):
         """
-        Initialisation
+        Initialise le réseau avec le nombre d'entrées, de couches
         """
         if not isinstance(nx, int):
             raise TypeError("nx must be an integer")
@@ -55,23 +49,35 @@ class DeepNeuralNetwork:
 
     @property
     def L(self):
+        """
+        Retourne le nombre de couches du réseau.
+        """
         return self.__L
 
     @property
     def cache(self):
+        """
+        Retourne le cache contenant les valeurs intermédiaires de propagation.
+        """
         return self.__cache
 
     @property
     def weights(self):
+        """
+        Retourne les poids et biais du réseau.
+        """
         return self.__weights
 
     @property
     def activation(self):
+        """
+        Retourne la fonction d'activation utilisée dans les couches cachées.
+        """
         return self.__activation
 
     def forward_prop(self, X):
         """
-        Calcul de la propagation avant
+        Effectue la propagation avant à travers le réseau.
         """
         self.__cache['A0'] = X
 
@@ -96,21 +102,36 @@ class DeepNeuralNetwork:
         return (self.__cache[Akey], self.__cache)
 
     def sigmoid(self, z):
+        """
+        Calcule la fonction sigmoid.
+        """
         return 1 / (1 + np.exp(-z))
 
     def tanh(self, z):
+        """
+        Calcule la fonction tanh.
+        """
         return np.tanh(z)
 
     def softmax(self, z):
+        """
+        Calcule la fonction softmax.
+        """
         y_hat = np.exp(z - np.max(z))
         return y_hat / y_hat.sum(axis=0)
 
     def cost(self, Y, A):
+        """
+        Calcule le coût de la prédiction.
+        """
         m = Y.shape[1]
         cost = -np.sum(Y * np.log(A)) / m
         return cost
 
     def evaluate(self, X, Y):
+        """
+        Évalue les performances du modèle sur des données données.
+        """
         A, _ = self.forward_prop(X)
         cost = self.cost(Y, A)
         Y_hat = np.max(A, axis=0)
@@ -119,7 +140,7 @@ class DeepNeuralNetwork:
 
     def gradient_descent(self, Y, cache, alpha=0.05):
         """
-        Descente de gradient
+        Met à jour les poids et biais du réseau via descente de gradient.
         """
         m = Y.shape[1]
         Al = cache["A{}".format(self.__L)]
@@ -130,7 +151,7 @@ class DeepNeuralNetwork:
             bkey = "b{}".format(i)
             Al = cache["A{}".format(i)]
             Al1 = cache["A{}".format(i - 1)]
-            
+
             if i < self.__L:
                 if self.__activation == 'sig':
                     g = Al * (1 - Al)
@@ -151,7 +172,7 @@ class DeepNeuralNetwork:
     def train(self, X, Y, iterations=5000, alpha=0.05, verbose=True,
               graph=True, step=100):
         """
-        Entraînement
+        Entraîne le réseau de neurones sur un ensemble de données.
         """
         if type(iterations) is not int:
             raise TypeError("iterations must be an integer")
@@ -191,6 +212,9 @@ class DeepNeuralNetwork:
         return self.evaluate(X, Y)
 
     def save(self, filename):
+        """
+        Sauvegarde une instance du réseau dans un fichier.
+        """
         if not filename.endswith(".pkl"):
             filename = filename + ".pkl"
         with open(filename, 'wb') as f:
@@ -198,6 +222,9 @@ class DeepNeuralNetwork:
 
     @staticmethod
     def load(filename):
+        """
+        Charge une instance du réseau depuis un fichier.
+        """
         try:
             with open(filename, 'rb') as f:
                 return pickle.load(f)
