@@ -6,7 +6,9 @@ import numpy as np
 
 
 def one_hot_encode(Y, classes):
-    if not isinstance(Y, np.ndarray) or Y.ndim != 1 or not isinstance(classes, int) or classes <= 0:
+    """method"""
+    if not isinstance(Y, np.ndarray) or Y.ndim != 1 or not isinstance(
+             classes, int) or classes <= 0:
         return None
     m = Y.shape[0]
     one_hot = np.zeros((classes, m))
