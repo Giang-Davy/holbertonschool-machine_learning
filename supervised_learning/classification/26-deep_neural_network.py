@@ -145,15 +145,34 @@ class DeepNeuralNetwork:
         return predictions, cost
 
     def save(self, filename):
-        """Sauvegarde l'instance de l'objet dans un fichier au format pickle"""
+        """
+        Sauvegarde l'instance du réseau de neurones dans un fichier
+
+        Args:
+            filename (str): nom du fichier de sauvegarde
+
+        Notes:
+            Si filename n'a pas l'extension .pkl, elle est ajoutée
+        """
         if not filename.endswith('.pkl'):
             filename += '.pkl'
+
         with open(filename, 'wb') as f:
             pickle.dump(self, f)
 
     @staticmethod
     def load(filename):
-        """Charge un objet DeepNeuralNetwork depuis un fichier pickle"""
-        with open(filename, 'rb') as f:
-            loaded_object = pickle.load(f)
-        return loaded_object
+        """
+        Charge une instance de DeepNeuralNetwork depuis un fichier
+
+        Args:
+            filename (str): nom du fichier à charger
+
+        Returns:
+            DeepNeuralNetwork: l'instance chargée, None si erreur
+        """
+        try:
+            with open(filename, 'rb') as f:
+                return pickle.load(f)
+        except Exception:
+            return None
