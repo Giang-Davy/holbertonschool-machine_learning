@@ -3,15 +3,10 @@
 
 
 import tensorflow.compat.v1 as tf
-# tf.disable_eager_execution()
 
 
-def create_layer(prev, n, activation):
-    """fffff"""
-    initializer = tf.keras.initializers.VarianceScaling(mode='fan_avg')
-    layer = tf.layers.Dense(units=n, activation=activation,
-                            kernel_initializer=initializer, name='layer')
-    return layer(prev)
+create_layer = __import__('1-create_layer').create_layer
+
 
 def forward_prop(x, layer_sizes=[], activations=[]):
     """ffff"""
