@@ -47,25 +47,31 @@ def train(X_train, Y_train, X_valid, Y_valid, layer_sizes, activations, alpha, i
     # Save model
     saver = tf.train.Saver()
 
+    # Start session
     with tf.Session() as sess:
         sess.run(init)
 
-    for i in range(iterations + 1):
-            cost_train, accuracy_train = sess.run(
-                [loss, accuracy],
-                feed_dict={x: X_train, y: Y_train})
-            cost_valid, accuracy_valid = sess.run(
-                [loss, accuracy],
-                feed_dict={x: X_valid, y: Y_valid})
+        for i in range(iterations + 1):
+            # Perform training step
+            sess.run(train_op, feed_dict={x: X_train, y: Y_train})
 
             if i % 100 == 0 or i == iterations:
-                print("After {} iterations:".format(i))
-                print("\tTraining Cost: {}".format(cost_train))
-                print("\tTraining Accuracy: {}".format(accuracy_train))
-                print("\tValidation Cost: {}".format(cost_valid))
-                print("\tValidation Accuracy: {}".format(accuracy_valid))
-        
-    # Save the model
-    saved_path = saver.save(sess, save_path)
+                # Evaluate metrics
+                cost_train, accuracy_train = sess.run(
+                    [loss, accuracy],
+                    feed_dict={x: X_train, y: Y_train})
+                cost_valid, accuracy_valid = sess.run(
+                    [loss, accuracy],
+                    feed_dict={x: X_valid, y: Y_valid})
+
+                # Print metrics
+                print(f"After {i} iterations:")
+                print(f"\tTraining Cost: {cost_train}")
+                print(f"\tTraining Accuracy: {accuracy_train}")
+                print(f"\tValidation Cost: {cost_valid}")
+                print(f"\tValidation Accuracy: {accuracy_valid}")
+
+        # Save the model
+        saved_path = saver.save(sess, save_path)
 
     return saved_path
