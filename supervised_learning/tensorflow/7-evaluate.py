@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
-
-
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
-
 
 def evaluate(X, Y, save_path):
     # Charger le modèle sauvegardé
@@ -13,6 +10,10 @@ def evaluate(X, Y, save_path):
         # Restaurer les poids du modèle
         saver.restore(sess, save_path)
         
+        # Récupérer les tensors 'x' et 'y' à partir de la collection
+        x = tf.get_collection('x')[0]
+        y = tf.get_collection('y')[0]
+
         # Récupérer les tenseurs de prédiction, de perte et d'exactitude depuis le graphe
         graph = tf.get_default_graph()
         prediction_op = graph.get_tensor_by_name("prediction:0")  # Nom à adapter selon votre modèle
@@ -20,6 +21,6 @@ def evaluate(X, Y, save_path):
         accuracy_op = graph.get_tensor_by_name("accuracy:0")  # Nom à adapter selon votre modèle
         
         # Calculer la prédiction, la perte et l'exactitude
-        predictions, loss, accuracy = sess.run([prediction_op, loss_op, accuracy_op], feed_dict={X: X, Y: Y})
+        predictions, loss, accuracy = sess.run([prediction_op, loss_op, accuracy_op], feed_dict={x: X, y: Y})
     
     return predictions, accuracy, loss
