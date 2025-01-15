@@ -30,16 +30,23 @@ def train(X_train, Y_train, X_valid, Y_valid, layer_sizes, activations, alpha, i
     """
     # Create placeholders
     x, y = create_placeholders(X_train.shape[1], Y_train.shape[1])
+    tf.add_to_collection('x', x)
+    tf.add_to_collection('y', y)
 
     # Build forward propagation
     y_pred = forward_prop(x, layer_sizes, activations)
+    tf.add_to_collection('y_pred', y_pred)
 
     # Calculate loss and accuracy
     loss = calculate_loss(y, y_pred)
+    tf.add_to_collection('loss', loss)
+
     accuracy = calculate_accuracy(y, y_pred)
+    tf.add_to_collection('accuracy', accuracy)
 
     # Create training operation
     train_op = create_train_op(loss, alpha)
+    tf.add_to_collection('train_op', train_op)
 
     # Initialize variables
     init = tf.global_variables_initializer()
@@ -52,24 +59,24 @@ def train(X_train, Y_train, X_valid, Y_valid, layer_sizes, activations, alpha, i
         sess.run(init)
 
         for i in range(iterations + 1):
-            # Perform training step
-            sess.run(train_op, feed_dict={x: X_train, y: Y_train})
+            # Evaluate metrics
+            cost_train, accuracy_train = sess.run(
+                [loss, accuracy],
+                feed_dict={x: X_train, y: Y_train})
+            cost_valid, accuracy_valid = sess.run(
+                [loss, accuracy],
+                feed_dict={x: X_valid, y: Y_valid})
 
             if i % 100 == 0 or i == iterations:
-                # Evaluate metrics
-                cost_train, accuracy_train = sess.run(
-                    [loss, accuracy],
-                    feed_dict={x: X_train, y: Y_train})
-                cost_valid, accuracy_valid = sess.run(
-                    [loss, accuracy],
-                    feed_dict={x: X_valid, y: Y_valid})
+                print("After {} iterations:".format(i))
+                print("\tTraining Cost: {}".format(cost_train))
+                print("\tTraining Accuracy: {}".format(accuracy_train))
+                print("\tValidation Cost: {}".format(cost_valid))
+                print("\tValidation Accuracy: {}".format(accuracy_valid))
 
-                # Print metrics
-                print(f"After {i} iterations:")
-                print(f"\tTraining Cost: {cost_train}")
-                print(f"\tTraining Accuracy: {accuracy_train}")
-                print(f"\tValidation Cost: {cost_valid}")
-                print(f"\tValidation Accuracy: {accuracy_valid}")
+            # Perform a training step
+            if i < iterations:
+                sess.run(train_op, feed_dict={x: X_train, y: Y_train})
 
         # Save the model
         saved_path = saver.save(sess, save_path)
