@@ -50,22 +50,30 @@ def train(X_train, Y_train, X_valid, Y_valid, layer_sizes, activations, alpha, i
     with tf.Session() as sess:
         sess.run(init)
 
-        for i in range(iterations + 1):
-            # Training step
-            sess.run(train_op, feed_dict={x: X_train, y: Y_train})
+    for i in range(iterations + 1):
+        sess.run(train_op, feed_dict={x: X_train, y: Y_train})
 
-            if i == 0 or i % 100 == 0 or i == iterations:
-                # Evaluate metrics
-                train_cost = sess.run(loss, feed_dict={x: X_train, y: Y_train})
-                train_acc = sess.run(accuracy, feed_dict={x: X_train, y: Y_train})
-                valid_cost = sess.run(loss, feed_dict={x: X_valid, y: Y_valid})
-                valid_acc = sess.run(accuracy, feed_dict={x: X_valid, y: Y_valid})
+        if i % 100 == 0 or i == iterations:
+            # Calcul des métriques pour l'ensemble d'entraînement
+            train_cost = sess.run(loss, feed_dict={x: X_train, y: Y_train})
+            train_acc = sess.run(accuracy, feed_dict={x: X_train, y: Y_train})
 
-                print(f"After {i} iterations:")
-                print(f"\tTraining Cost: {train_cost}")
-                print(f"\tTraining Accuracy: {train_acc}")
-                print(f"\tValidation Cost: {valid_cost}")
-                print(f"\tValidation Accuracy: {valid_acc}")
+            # Calcul des métriques pour l'ensemble de validation
+            valid_cost = sess.run(loss, feed_dict={x: X_valid, y: Y_valid})
+            valid_acc = sess.run(accuracy, feed_dict={x: X_valid, y: Y_valid})
+
+            # Arrondir les valeurs à un nombre précis de décimales (facultatif)
+            train_cost = round(train_cost, 8)
+            train_acc = round(train_acc, 8)
+            valid_cost = round(valid_cost, 8)
+            valid_acc = round(valid_acc, 8)
+
+            # Affichage des résultats
+            print(f"After {i} iterations:")
+            print(f"\tTraining Cost: {train_cost}")
+            print(f"\tTraining Accuracy: {train_acc}")
+            print(f"\tValidation Cost: {valid_cost}")
+            print(f"\tValidation Accuracy: {valid_acc}")
 
         # Save the model
         saved_path = saver.save(sess, save_path)
