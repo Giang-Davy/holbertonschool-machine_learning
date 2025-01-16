@@ -9,4 +9,6 @@ def one_hot(labels, classes=None):
     """1-chaud"""
     if classes is None:
         classes = len(set(labels))
-    return K.backend.one_hot(labels, classes)
+    one_hot_matrix = K.backend.one_hot(labels, classes)
+    # Extraire les valeurs du tenseur
+    return K.backend.get_value(one_hot_matrix)
