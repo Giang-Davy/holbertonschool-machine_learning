@@ -12,14 +12,13 @@ def build_model(nx, layers, activations, lambtha, keep_prob):
     model = K.models.Sequential()
 
     # Ajouter la première couche avec input_dim pour la couche d'entrée
-    model.add(K.layers.Dense(units=layers[0], activation=activations[0], input_dim=nx))
+    model.add(K.layers.Dense(units=layers[0],
+              activation=activations[0], input_dim=nx))
 
     # Ajouter les autres couches avec boucle
     for i in range(1, len(layers)):
-        model.add(K.layers.Dense(units=layers[i], activation=activations[i]))
-
-        # Ajouter Dropout après chaque couche cachée
         model.add(K.layers.Dropout(rate=1 - keep_prob))
+        model.add(K.layers.Dense(units=layers[i], activation=activations[i]))
 
     # Ajouter la régularisation L2 à chaque couche cachée
     for layer in model.layers:
