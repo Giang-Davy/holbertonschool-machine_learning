@@ -7,7 +7,7 @@ import tensorflow.keras as K
 
 def save_model(network, filename):
     """sauvegarde modele"""
-    keras.models.save_model(
+    K.models.save_model(
         network,
         filepath=filename,
         overwrite=True,
@@ -18,7 +18,7 @@ def save_model(network, filename):
 
 def load_model(filename):
     """charge un modele"""
-    return keras.models.load_model(
+    return K.models.load_model(
         filepath=filename,
         custom_objects=None,
         compile=True
