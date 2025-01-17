@@ -6,16 +6,7 @@ import tensorflow.keras as K
 
 
 def save_model(network, filename):
-    """
-    Sauvegarde un modèle Keras complet
-
-    Arguments:
-        network: le modèle à sauvegarder
-        filename: chemin du fichier où sauvegarder le modèle
-
-    Returns:
-        None
-    """
+    """sauvegarde"""
     network.save(filename)
     return None
 
