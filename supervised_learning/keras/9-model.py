@@ -14,7 +14,7 @@ def save_model(network, filename):
         include_optimizer=True,
         save_format=None
     )
-
+    return None
 
 def load_model(filename):
     """charge un modele"""
