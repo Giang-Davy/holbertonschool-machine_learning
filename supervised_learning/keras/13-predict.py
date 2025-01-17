@@ -9,4 +9,3 @@ def predict(network, data, verbose=False):
     """prediction"""
     prediction = network.predict(data, verbose=False)
     return prediction
-
