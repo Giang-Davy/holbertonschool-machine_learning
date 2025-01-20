@@ -7,7 +7,11 @@ import numpy as np
 
 def shuffle_data(X, Y):
     """shuffle"""
-    X_shuffle = np.random.permutation(X)
-    Y_shuffle = np.random.permutation(Y)
+    # Générer une permutation aléatoire des indices
+    indices = np.random.permutation(X.shape[0])
+
+    # Appliquer cette permutation aux matrices X et Y
+    X_shuffle = X[indices]
+    Y_shuffle = Y[indices]
 
     return X_shuffle, Y_shuffle
