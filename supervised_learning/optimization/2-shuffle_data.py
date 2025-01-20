@@ -7,7 +7,7 @@ import numpy as np
 
 def shuffle_data(X, Y):
     """shuffle"""
-    np.random.permutation(X)
-    np.random.permutation(Y)
-    
-    return X, Y
+    X_shuffle = np.random.permutation(X)
+    Y_shuffle = np.random.permutation(Y)
+
+    return X_shuffle, Y_shuffle
