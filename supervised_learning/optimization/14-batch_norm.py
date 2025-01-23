@@ -6,6 +6,7 @@ import tensorflow as tf
 
 
 def create_batch_norm_layer(prev, n, activation):
+    """creation lot"""
     dense = tf.keras.layers.Dense(
         units=n,
         activation=None,
