@@ -16,7 +16,7 @@ def create_confusion_matrix(labels, logits):
     - confusion (numpy.ndarray): Matrice rme (classes, classes).
     """
     # Initialiser la matrice de confusion avec des zéros
-    confusion = np.zeros((labels.shape[1], labels.shape[1]), dtype=int)
+    confusion = np.zeros((labels.shape[1], labels.shape[1]))
 
     # Parcourir tous les points de données
     for i in range(labels.shape[0]):
