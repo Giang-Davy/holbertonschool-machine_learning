@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+"""fonction"""
 
 import numpy as np
 
@@ -13,7 +13,7 @@ def create_confusion_matrix(labels, logits):
     - lots (numpy.ndarray): Tableau one-hnant les labels prédits.
 
     Retourne :
-    - confusion (numpy.ndarray): Matrice rme (classes, classes).
+    - confusion (numpy.ndarray): Matrice de confurme (classes, classes).
     """
     # Initialiser la matrice de confusion avec des zéros
     confusion = np.zeros((labels.shape[1], labels.shape[1]))
