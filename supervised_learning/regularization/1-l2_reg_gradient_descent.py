@@ -6,6 +6,7 @@ import numpy as np
 
 
 def l2_reg_gradient_descent(Y, weights, cache, alpha, lambtha, L):
+    """L2dsdsqd"""
     m = Y.shape[1]
 
     A_L = cache["A" + str(L)]
@@ -21,7 +22,6 @@ def l2_reg_gradient_descent(Y, weights, cache, alpha, lambtha, L):
         weights["W" + str(i)] -= alpha * dW
         weights["b" + str(i)] -= alpha * db
         if i > 1:
-            dZ_L = np.dot(W.T, dZ_L) * (
-                1 - np.power(cache["A" + str(i - 1)], 2))
+            dZ_L = np.dot(W.T, dZ_L) * (1 - np.power(cache["A" + str(i - 1)], 2))
 
     return weights
