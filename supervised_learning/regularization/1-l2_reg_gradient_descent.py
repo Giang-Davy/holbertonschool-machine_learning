@@ -1,27 +1,22 @@
 #!/usr/bin/env python3
 """fonction"""
 
-
 import numpy as np
 
 
 def l2_reg_gradient_descent(Y, weights, cache, alpha, lambtha, L):
-    """L2dsdsqd"""
+    """L2 gradient"""
     m = Y.shape[1]
 
-    A_L = cache["A" + str(L)]
-    dZ_L = A_L - Y
+    for l in range(L, 0, -1):
+        A = cache[f'A{l}']
+        if l == L:
+            dz = A - Y
+        else:
+            dz = np.multiply(np.dot(weights[f'W{l+1}'].T, dz), (1 - np.power(A, 2)))
 
-    for i in reversed(range(1, L + 1)):
-        A_prev = cache["A" + str(i - 1)] if i > 1 else cache["A0"]
-        W = weights["W" + str(i)]
+        dw = np.dot(dz, cache[f'A{l-1}'].T) / m + (lambtha / m) * weights[f'W{l}']
+        db = np.sum(dz, axis=1, keepdims=True) / m
 
-        dW = np.dot(dZ_L, A_prev.T) / m + (lambtha / m) * W
-        db = np.sum(dZ_L, axis=1, keepdims=True) / m
-
-        weights["W" + str(i)] -= alpha * dW
-        weights["b" + str(i)] -= alpha * db
-        if i > 1:
-            dZ_L = np.dot(W.T, dZ_L) * (1 - np.power(cache["A" + str(i - 1)], 2))
-
-    return weights
+        weights[f'W{l}'] -= alpha * dw
+        weights[f'b{l}'] -= alpha * db
