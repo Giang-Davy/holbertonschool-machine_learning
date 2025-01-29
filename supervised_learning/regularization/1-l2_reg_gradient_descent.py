@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-
-
 import numpy as np
 
-
-def l2_reg_gradient_descent(Y, weights, cache, alpha, lambtha, L):
+def l2_reg_gradient_descent(Y, weights, cache, alpha, lambtha, L, seed=None):
+    if seed is not None:
+        np.random.seed(seed)
+    
     m = Y.shape[1]
     A = cache['A' + str(L)]
     dZ = A - Y
