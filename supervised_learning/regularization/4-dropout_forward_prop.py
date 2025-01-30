@@ -6,6 +6,7 @@ import numpy as np
 
 
 def dropout_forward_prop(X, weights, L, keep_prob):
+    """Droupout-avant"""
     cache = {'A0': X}
     for i in range(1, L + 1):
         W = weights['W' + str(i)]
