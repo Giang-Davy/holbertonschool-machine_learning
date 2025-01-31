@@ -9,7 +9,7 @@ def early_stopping(cost, opt_cost, threshold, patience, count):
     """stopper en avance"""
 
     if cost > threshold + opt_cost:
-        return (True, count)
+        return (True, 0)
     else:
         count += 1
     if count >= patience:
