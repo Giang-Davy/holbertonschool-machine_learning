@@ -7,10 +7,10 @@ import numpy as np
 
 def early_stopping(cost, opt_cost, threshold, patience, count):
     """stopper en avance"""
-    if cost > threshold + opt_cost:
-        return (True, count)
+    if opt_cost - cost > threshold:
+        return (False, 0)
     else:
         count += 1
-    if count >= patience:
-        return (True, count)
-    return (False, count)
+        if count >= patience:
+            return (True, count)
+        return (False, count)
