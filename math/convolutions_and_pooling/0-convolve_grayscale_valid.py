@@ -13,12 +13,11 @@ def convolve_grayscale_valid(images, kernel):
     new_w = w - kw + 1
     conv_result = np.zeros((m, new_h, new_w))
 
-    for i in range(m):
+    for i in range(new_h):
         # Appliquer la convolution sur chaque image
-        for idx in range(new_h * new_w):
-            y = idx // new_w
-            x = idx % new_w
-            conv_result[i, y, x] = np.sum(
-                images[i, y:y+kh, x:x+kw] * kernel)
+        for j in range(new_w):
+            conv_result[:, i, j] = np.sum(
+                    images[:, i:i+kh, j:j+kw] * kernel, axis=(1, 2)
+                    )
 
     return conv_result
