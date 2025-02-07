@@ -13,8 +13,8 @@ def conv_backward(dZ, A_prev, W, b, padding="same", stride=(1, 1)):
     sh, sw = stride
 
     if padding == "same":
-        pad_h = int(((h_prev - 1) * sh + kh - h_new) / 2)
-        pad_w = int(((w_prev - 1) * sw + kw - w_new) / 2)
+        pad_h = int(((h_prev - 1) * sh + kh - h_new) // 2)
+        pad_w = int(((w_prev - 1) * sw + kw - w_new) // 2)
         A_prev_pad = np.pad(A_prev, ((0, 0), (pad_h, pad_h), (
             pad_w, pad_w), (0, 0)), mode='constant', constant_values=0)
     elif padding == "valid":
