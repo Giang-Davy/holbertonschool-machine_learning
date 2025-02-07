@@ -1,4 +1,9 @@
+#!/usr/bin/env python3
+"""backward pass of a convolutional layer"""
+
+
 import numpy as np
+
 
 def conv_backward(dZ, A_prev, W, b, padding="same", stride=(1, 1)):
     (m, h_new, w_new, c_new) = dZ.shape
