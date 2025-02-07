@@ -39,7 +39,7 @@ def conv_backward(dZ, A_prev, W, b, padding="same", stride=(1, 1)):
                     db[:, :, :, c] += dZ[i, h, w, c]
 
         if padding == "same":
-            dA_prev[i, :, :, :] = dA_prev_padded[i, pad_h:-pad_h, pad_w:-pad_w, :]
+            dA_prev[i, :, :, :] = dA_prev_padded[i, pad_h:pad_h + h_prev, pad_w:pad_w + w_prev, :]
         else:
             dA_prev[i, :, :, :] = dA_prev_padded[i, :, :, :]
 
