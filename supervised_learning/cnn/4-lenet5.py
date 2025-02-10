@@ -5,6 +5,8 @@
 import tensorflow.compat.v1 as tf
 
 
+tf.set_random_seed(42)  # Fixe le seed pour TensorFlow
+
 def lenet5(x, y):
     """modèle LeNet-5"""
     initializer = tf.keras.initializers.VarianceScaling(scale=2.0)
