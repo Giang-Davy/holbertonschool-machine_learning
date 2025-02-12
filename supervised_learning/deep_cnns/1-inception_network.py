@@ -9,15 +9,13 @@ inception_block = __import__('0-inception_block').inception_block
 def inception_network():
     """réseau inception"""
     input = K.layers.Input(shape=(224, 224, 3))
-    initializer = K.initializers.VarianceScaling(scale=2.0)
 
     conv1 = K.layers.Conv2D(
         filters=64,
         kernel_size=(7, 7),
         activation='relu',
         padding="same",
-        strides=2,
-        kernel_initializer=initializer)(input)
+        strides=2)(input)
 
     pool1 = K.layers.MaxPooling2D(
         pool_size=(3, 3),
@@ -41,10 +39,11 @@ def inception_network():
     incept4b = inception_block(incept4a, [160, 112, 224, 24, 64, 64])
     incept4c = inception_block(incept4b, [128, 128, 256, 24, 64, 64])
     incept4d = inception_block(incept4c, [112, 144, 288, 32, 64, 64])
+    incept4e = inception_block(incept4d, [256, 160, 320, 32, 128, 128])
     pool3 = K.layers.MaxPooling2D(
         pool_size=(3, 3),
         strides=(2, 2),
-        padding="same")(incept4d)
+        padding="same")(incept4e)
     incept5a = inception_block(pool3, [256, 160, 320, 32, 128, 128])
     incept5b = inception_block(incept5a, [384, 192, 384, 48, 128, 128])
     avg_pool = K.layers.AveragePooling2D((7, 7), strides=(1, 1))(incept5b)
