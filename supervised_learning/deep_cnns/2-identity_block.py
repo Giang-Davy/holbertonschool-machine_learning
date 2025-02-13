@@ -8,7 +8,7 @@ from tensorflow import keras as K
 def identity_block(A_prev, filters):
     """"block identité"""
     F11, F3, F12 = filters
-    initializer = K.initializers.VarianceScaling(scale=2.0)
+    initializer = K.initializers.HeNormal(seed=0)
 
     convF11 = K.layers.Conv2D(
         filters=F11,
