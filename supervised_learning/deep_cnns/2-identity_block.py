@@ -6,35 +6,28 @@ from tensorflow import keras as K
 
 
 def identity_block(A_prev, filters):
-    """"block identité"""
+    """construit un bloc d'identité"""
     F11, F3, F12 = filters
+
     initializer = K.initializers.HeNormal(seed=0)
 
-    convF11 = K.layers.Conv2D(
-        filters=F11,
-        kernel_size=(1, 1),
-        activation='relu',
-        padding="same",
-        kernel_initializer=initializer)(A_prev)
-    batch1 = K.layers.BatchNormalization(axis=-1)(convF11)
+    conv1 = K.layers.Conv2D(
+        F11, (1, 1), padding='same', kernel_initializer=initializer)(A_prev)
+    batch_norm1 = K.layers.BatchNormalization(axis=3)(conv1)
+    activation1 = K.layers.Activation('relu')(batch_norm1)
 
-    convF13 = K.layers.Conv2D(
-        filters=F3,
-        kernel_size=(3, 3),
-        activation='relu',
-        padding="same",
-        kernel_initializer=initializer)(batch1)
-    batch2 = K.layers.BatchNormalization(axis=-1)(convF13)
+    conv2 = K.layers.Conv2D(
+        F3, (3, 3), padding='same',
+        kernel_initializer=initializer)(activation1)
+    batch_norm2 = K.layers.BatchNormalization(axis=3)(conv2)
+    activation2 = K.layers.Activation('relu')(batch_norm2)
 
-    convF12 = K.layers.Conv2D(
-        filters=F12,
-        kernel_size=(1, 1),
-        activation='relu',
-        padding="same",
-        kernel_initializer=initializer)(batch2)
-    batch3 = K.layers.BatchNormalization(axis=-1)(convF12)
-    activation3 = K.layers.ReLU()(batch3)
+    conv3 = K.layers.Conv2D(
+        F12, (1, 1), padding='same',
+        kernel_initializer=initializer)(activation2)
+    batch_norm3 = K.layers.BatchNormalization(axis=3)(conv3)
 
-    output = K.layers.add([activation3, A_prev])
+    output = K.layers.add([batch_norm3, A_prev])
+    activated_output = K.layers.Activation('relu')(output)
 
-    return output
+    return activated_output
