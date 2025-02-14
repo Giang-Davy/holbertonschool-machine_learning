@@ -48,9 +48,7 @@ def densenet121(growth_rate=32, compression=1.0):
     dense4, nb_filters = dense_block(transition3, nb_filters, growth_rate, 16)
 
     # Global Average Pooling
-    avg_pool = K.layers.AveragePooling2D(pool_size=(7, 7),
-                                         strides=7,
-                                         padding='same')(dense4)
+    avg_pool = K.layers.GlobalAveragePooling2D()(dense4)
 
     # Fully Connected Layer
     outputs = K.layers.Dense(1000, activation="softmax")(avg_pool)
