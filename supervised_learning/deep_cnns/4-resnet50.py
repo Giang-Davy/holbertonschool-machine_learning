@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""fonction"""
 
 
 from tensorflow import keras as K
@@ -16,7 +17,7 @@ def resnet50():
         filters=64,
         kernel_size=(7, 7),
         padding="same",
-        strides=(2, 2),
+        strides=(2,2),
         kernel_initializer=initializer)(input)
     batch_norm1 = K.layers.BatchNormalization(axis=3)(conv1)
     activation1 = K.layers.Activation('relu')(batch_norm1)
