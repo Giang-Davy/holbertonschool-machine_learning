@@ -25,7 +25,7 @@ def densenet121(growth_rate=32, compression=1.0):
     # MaxPooling
     pool1 = K.layers.MaxPooling2D(
         pool_size=(3, 3),
-        strides=2,
+        strides=(2,2)
         padding="same")(conv1)
 
     # Dense Block 1
@@ -51,8 +51,8 @@ def densenet121(growth_rate=32, compression=1.0):
 
     # Global Average Pooling
     avg_pool = K.layers.AveragePooling2D(pool_size=(7, 7),
-                                         strides=7,
-                                         padding='same')(dense4)
+                                         strides=(1,1),
+                                         padding='valid')(dense4)
 
     # Fully Connected Layer
     outputs = K.layers.Dense(1000, activation="softmax", kernel_initializer=initializer)(avg_pool)
