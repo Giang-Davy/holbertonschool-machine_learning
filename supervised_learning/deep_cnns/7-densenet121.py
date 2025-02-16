@@ -25,7 +25,7 @@ def densenet121(growth_rate=32, compression=1.0):
     # MaxPooling
     pool1 = K.layers.MaxPooling2D(
         pool_size=(3, 3),
-        strides=(2,2)
+        strides=(2, 2),
         padding="same")(conv1)
 
     # Dense Block 1
