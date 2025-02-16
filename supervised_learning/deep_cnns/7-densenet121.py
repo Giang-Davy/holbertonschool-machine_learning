@@ -11,7 +11,7 @@ def densenet121(growth_rate=32, compression=1.0):
     """Construit le modèle DenseNet-121"""
     initializer = K.initializers.HeNormal(seed=0)
     inputs = K.layers.Input(shape=(224, 224, 3))
-    batch_norm1 = K.layers.BatchNormalization(axis=3)(inputs)
+    batch_norm1 = K.layers.BatchNormalization(axis=-1)(inputs)
     activation1 = K.layers.Activation('relu')(batch_norm1)
 
     # Convolution initiale
