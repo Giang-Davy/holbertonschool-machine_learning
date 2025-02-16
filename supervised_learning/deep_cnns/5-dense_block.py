@@ -1,58 +1,48 @@
 #!/usr/bin/env python3
-"""
-Dense Block
-"""
+"""fonction"""
+
 
 from tensorflow import keras as K
 
 
 def dense_block(X, nb_filters, growth_rate, layers):
     """
-    Builds a dense block as described in
-    'Densely Connected Convolutional Networks' (2016)'
+    Construire un Dense Block avec un nombre spécifié de couches.
 
-    Parameters:
-    X : tensor
-        The output of the previous layer.
-    nb_filters : int
-        The number of filters in X.
-    growth_rate : int
-        The growth rate for the dense block.
-    layers : int
-        The number of layers in the dense block.
+    X : sortie de la couche précédente.
+    nb_filters : nombre de filtres dans X.
+    growth_rate : taux de croissance pour le Dense Block.
+    layers : nombre de couches dans le Dense Block.
 
-    Returns:
-    tensor, int
-        The concatenated output of each layer within the Dense Block
-        and the number of filters within the concatenated outputs,
-        respectively.
+    Retourne : La sortie concaténée de chaque couche au sein de filtres.
     """
-    init = K.initializers.HeNormal(seed=0)
-    concat_features = X
 
-    for _ in range(layers):
-        # Batch Normalization and ReLU
-        bn1 = K.layers.BatchNormalization(axis=-1)(concat_features)
-        relu1 = K.layers.Activation('relu')(bn1)
+    for i in range(layers):
+        # Normalisation + Activation avant la première convolution (1x1)
+        norm1 = K.layers.BatchNormalization()(X)
+        act1 = K.layers.ReLU()(norm1)
 
-        # 1x1 Convolution (Bottleneck layer)
-        conv1 = K.layers.Conv2D(4 * growth_rate,
-                                (1, 1),
-                                padding='same',
-                                kernel_initializer=init)(relu1)
+        # Bottleneck: Convolution 1x1
+        bottleneck = K.layers.Conv2D(
+            filters=4 * growth_rate,  # Le nombre de fit 4 fois le growth_rate
+            kernel_size=(1, 1),
+            padding='same',
+            kernel_initializer=K.initializers.he_normal(seed=0)
+        )(act1)
 
-        # Batch Normalization and ReLU
-        bn2 = K.layers.BatchNormalization(axis=-1)(conv1)
-        relu2 = K.layers.Activation('relu')(bn2)
+        # Normalisation + Activation avant la deuxième convolution (3x3)
+        norm2 = K.layers.BatchNormalization()(bottleneck)
+        act2 = K.layers.ReLU()(norm2)
 
-        # 3x3 Convolution
-        conv2 = K.layers.Conv2D(growth_rate,
-                                (3, 3), padding='same',
-                                kernel_initializer=init)(relu2)
+        # Convolution 3x3
+        conv3x3 = K.layers.Conv2D(
+            filters=growth_rate,  # Le taux de croissance est ajoutée la couche
+            kernel_size=(3, 3),
+            padding='same',
+            kernel_initializer=K.initializers.he_normal(seed=0)
+        )(act2)
 
-        # Concatenate input with output of the 3x3 convolution
-        concat_features = K.layers.Concatenate(axis=-1)([concat_features,
-                                                         conv2])
-        nb_filters += growth_rate
+        # Concaténation de l'entrée X avec la sortie de la couche
+        X = K.layers.Concatenate()([X, conv3x3])
 
-    return concat_features, nb_filters
+    return X, nb_filters + layers * growth_rate
