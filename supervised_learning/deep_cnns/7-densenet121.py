@@ -55,7 +55,7 @@ def densenet121(growth_rate=32, compression=1.0):
                                          padding='same')(dense4)
 
     # Fully Connected Layer
-    outputs = K.layers.Dense(1000, activation="softmax")(avg_pool)
+    outputs = K.layers.Dense(1000, activation="softmax", kernel_initializer=initializer)(avg_pool)
 
     model = K.models.Model(inputs=inputs, outputs=outputs)
 
