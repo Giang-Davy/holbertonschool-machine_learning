@@ -1,37 +1,44 @@
 #!/usr/bin/env python3
-"""fonction"""
-
+"""
+Transition Layer
+"""
 
 from tensorflow import keras as K
 
 
 def transition_layer(X, nb_filters, compression):
     """
-    Ajoute une couche de transition avec compressiDense Block.
+    Builds a transition layer as described in
+    'Densely Connected Convolutional Networks' (2016).
 
-    X : sortie du Dense Block.
-    nb_filters : nombre initial de filtres.
-    compression : facteur de réduction (entre 0 et 1).
+    Parameters:
+    X : tensor
+        The output of the previous layer.
+    nb_filters : int
+        The number of filters in X.
+    compression : float
+        The compression factor for the transition layer.
 
-    Retourne : la sortie de la couche de transition et le nouveau noe filtres.
+    Returns:
+    tensor, int
+        The output of the transition layer and the number of filters
+        within the output, respectively.
     """
-    # Calcul du nombre de filtres après compression
-    nb_filters_reduced = int(nb_filters * compression)
+    init = K.initializers.HeNormal(seed=0)
+    compressed_filters = int(nb_filters * compression)
 
-    # Normalisation et activation
-    norm = K.layers.BatchNormalization()(X)
-    act = K.layers.ReLU()(norm)
+    # Batch Normalization and ReLU
+    bn = K.layers.BatchNormalization(axis=-1)(X)
+    relu = K.layers.Activation('relu')(bn)
 
-    # Convolution 1x1 pour réduire les filtres
-    conv = K.layers.Conv2D(
-        filters=nb_filters_reduced,  # Réduction
-        kernel_size=(1, 1),
-        padding='same',
-        kernel_initializer=K.initializers.he_normal(seed=0)
-    )(act)
+    # 1x1 Convolution
+    conv = K.layers.Conv2D(compressed_filters,
+                           (1, 1), padding='same',
+                           kernel_initializer=init)(relu)
 
-    # Average Pooling pour réduire la taille spatiale
-    pool = K.layers.AveragePooling2D(pool_size=(2, 2),
-                                     strides=(2, 2), padding='same')(conv)
+    # Average Pooling
+    avg_pool = K.layers.AveragePooling2D((2, 2),
+                                         strides=(2, 2),
+                                         padding='same')(conv)
 
-    return pool, nb_filters_reduced
+    return avg_pool, compressed_filters
