@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """Yolo class for object detection"""
 
-
 from tensorflow import keras as K
-import tensorflow as tf
-
+import numpy as np
 
 class Yolo:
     def __init__(self, model_path, classes_path, class_t, nms_t, anchors):
@@ -16,7 +14,7 @@ class Yolo:
             classes_path (str): path to the file containing class names.
             class_t (float): box score threshold for filtering.
             nms_t (float): IOU threshold for non-max suppression.
-            anchors (np.ndarray): array of anchor boxes of shape (outputs
+            anchors (np.ndarray): array of anchor boxes of shape (outputs, 3, 2)
         """
         self.model = K.models.load_model(model_path)
         with open(classes_path, 'r') as f:
@@ -25,50 +23,49 @@ class Yolo:
         self.nms_t = nms_t
         self.anchors = anchors
 
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
+
     def process_outputs(self, outputs, image_size):
-        """sortie"""
+        """
+        Process the outputs from the Darknet model for a single image.
+
+        Args:
+            outputs (list): list of numpy.ndarrays containing predictions from the model.
+            image_size (numpy.ndarray): image’s original size [image_height, image_width].
+
+        Returns:
+            tuple: (boxes, box_confidences, box_class_probs)
+        """
+        image_height, image_width = image_size
         boxes = []
         box_confidences = []
         box_class_probs = []
 
-        for i in range(len(outputs)):
-            output = outputs[i]
-            grid_height, grid_width, anchor_boxes, _ = output.shape
+        for output in outputs:
+            grid_height, grid_width, anchor_boxes = output.shape[:3]
 
-            for k in range(grid_height):
-                for j in range(grid_width):
-                    for a in range(anchor_boxes):
-                        box = output[k, j, a]
-                        
-                        # Récupère les coordonnées
-                        t_x, t_y, t_w, t_h = box[:4]
-                        
-                        # Calcule les coordonnées réelles (x1, y1, x2, y2)
-                        x1 = (t_x - t_w / 2) * image_size[1]  # image_width
-                        y1 = (t_y - t_h / 2) * image_size[0]  # image_height
-                        x2 = (t_x + t_w / 2) * image_size[1]  # image_width
-                        y2 = (t_y + t_h / 2) * image_size[0]  # image_height
-                        
-                        # Ajoute les coordonnées dans la liste
-                        boxes.append([x1, y1, x2, y2])
-                        box_confidences.append(box[4])
-                        box_class_probs.append(box[5:])
+            box_xy = self.sigmoid(output[..., :2])
+            box_wh = np.exp(output[..., 2:4])
+            box_confidence = self.sigmoid(output[..., 4:5])
+            box_class_probs = self.sigmoid(output[..., 5:])
 
-        # Applique la suppression non maximale (NMS)
-        boxes = tf.convert_to_tensor(boxes, dtype=tf.float32)
-        box_confidences = tf.convert_to_tensor(box_confidences, dtype=tf.float32)
+            anchors = self.anchors[:anchor_boxes]
 
-        # NMS : Suppression des boîtes en fonction de l'IOU
-        nms_indices = tf.image.non_max_suppression(
-            boxes=boxes,
-            scores=box_confidences,
-            max_output_size=50,
-            iou_threshold=self.nms_t
-        )
+            grid_x = np.tile(np.arange(grid_width).reshape(1, grid_width, 1), (grid_height, 1, anchor_boxes))
+            grid_y = np.tile(np.arange(grid_height).reshape(grid_height, 1, 1), (1, grid_width, anchor_boxes))
+            box_xy += np.stack([grid_x, grid_y], axis=-1)
+            box_xy /= [grid_width, grid_height]
 
-        # Filtre les boîtes et les scores avec les indices après NMS
-        boxes = tf.gather(boxes, nms_indices)
-        box_confidences = tf.gather(box_confidences, nms_indices)
-        box_class_probs = tf.gather(box_class_probs, nms_indices)
+            box_wh *= anchors / [image_width, image_height]
 
-        return boxes, box_confidences, box_class_probs
+            x1 = (box_xy[..., 0] - box_wh[..., 0] / 2) * image_width
+            y1 = (box_xy[..., 1] - box_wh[..., 1] / 2) * image_height
+            x2 = (box_xy[..., 0] + box_wh[..., 0] / 2) * image_width
+            y2 = (box_xy[..., 1] + box_wh[..., 1] / 2) * image_height
+
+            boxes.append(np.stack([x1, y1, x2, y2], axis=-1))
+            box_confidences.append(box_confidence)
+            box_class_probs.append(box_class_probs)
+
+        return (boxes, box_confidences, box_class_probs)
