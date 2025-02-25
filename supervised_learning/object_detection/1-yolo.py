@@ -23,6 +23,18 @@ class Yolo:
         self.nms_t = nms_t
         self.anchors = anchors
 
+    def sigmoid(self, x):
+        """
+        Compute the sigmoid of x.
+
+        Args:
+            x (numpy.ndarray): Input array.
+
+        Returns:
+            numpy.ndarray: Sigmoid of x.
+        """
+        return 1 / (1 + np.exp(-x))
+
     def process_outputs(self, outputs, image_size):
         """
         Process the outputs from the Darknet model for a single image.
@@ -43,10 +55,10 @@ class Yolo:
         for i, output in enumerate(outputs):
             grid_height, grid_width, anchor_boxes, _ = output.shape
 
-            box_xy = tf.sigmoid(output[..., :2])
-            box_wh = tf.exp(output[..., 2:4])
-            box_confidence = tf.sigmoid(output[..., 4:5])
-            box_class_prob = tf.sigmoid(output[..., 5:])
+            box_xy = self.sigmoid(output[..., :2])
+            box_wh = np.exp(output[..., 2:4])
+            box_confidence = self.sigmoid(output[..., 4:5])
+            box_class_prob = self.sigmoid(output[..., 5:])
 
             col = np.tile(np.arange(0, grid_width), grid_height).reshape(-1, grid_width)
             row = np.tile(np.arange(0, grid_height).reshape(-1, 1), grid_width)
