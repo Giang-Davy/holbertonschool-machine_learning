@@ -8,8 +8,9 @@ import cv2
 
 
 class Yolo:
+    """class yolo"""
     def __init__(self, model_path, classes_path, class_t, nms_t, anchors):
-        """initddddd"""
+        """init"""
         self.model = K.models.load_model(model_path)
         self.class_names = open(classes_path).read().splitlines()
         self.class_t = class_t
