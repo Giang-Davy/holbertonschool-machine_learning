@@ -1,84 +1,67 @@
 #!/usr/bin/env python3
-"""Yolo class for object detection"""
+"""Module de traitement des sorties YOLO"""
 
 import numpy as np
-import tensorflow as tf
+import tensorflow.keras as K
+
 
 class Yolo:
+    
     def __init__(self, model_path, classes_path, class_t, nms_t, anchors):
-        """
-        Initializes the Yolo class for object detection.
-
-        Args:
-            model_path (str): path to the Darknet Keras model.
-            classes_path (str): path to the file containing class names.
-            class_t (float): box score threshold for filtering.
-            nms_t (float): IOU threshold for non-max suppression.
-            anchors (np.ndarray): array of anchor boxes of shape (outputs, 2)
-        """
-        self.model = tf.keras.models.load_model(model_path)
+        self.model = K.models.load_model(model_path)
         with open(classes_path, 'r') as f:
-            self.class_names = [line.strip() for line in f.readlines()]
+            self.class_names = [line.strip() for line in f]
         self.class_t = class_t
         self.nms_t = nms_t
         self.anchors = anchors
 
     def sigmoid(self, x):
-        """
-        Compute the sigmoid of x.
-
-        Args:
-            x (numpy.ndarray): Input array.
-
-        Returns:
-            numpy.ndarray: Sigmoid of x.
-        """
+        """Fonction sigmoïde vectorisée"""
         return 1 / (1 + np.exp(-x))
 
     def process_outputs(self, outputs, image_size):
         """
-        Process the outputs from the Darknet model for a single image.
-
-        Args:
-            outputs (list): list of numpy.ndarrays containing the predictions from the Darknet model for a single image.
-            image_size (numpy.ndarray): array containing the image’s original size [image_height, image_width].
-
-        Returns:
-            tuple: (boxes, box_confidences, box_class_probs)
+        Traitement des sorties du réseau avec correction de l'erreur .value
         """
         boxes = []
         box_confidences = []
         box_class_probs = []
 
-        image_height, image_width = image_size
+        input_width = self.model.input.shape[1]
+        input_height = self.model.input.shape[2]
+        for output_idx, output in enumerate(outputs):
+            grid_h, grid_w, nb_ancres, _ = output.shape
 
-        for i, output in enumerate(outputs):
-            grid_height, grid_width, anchor_boxes, _ = output.shape
+            # Initialisation des tableaux de sortie
+            boxes_layer = np.zeros((grid_h, grid_w, nb_ancres, 4))
 
-            box_xy = self.sigmoid(output[..., :2])
-            box_wh = np.exp(output[..., 2:4])
-            box_confidence = self.sigmoid(output[..., 4:5])
-            box_class_prob = self.sigmoid(output[..., 5:])
+            for i in range(grid_h):
+                for j in range(grid_w):
+                    for k in range(nb_ancres):
+                        tx, ty, tw, th = output[i, j, k, :4]
 
-            col = np.tile(np.arange(0, grid_width), grid_height).reshape(-1, grid_width)
-            row = np.tile(np.arange(0, grid_height).reshape(-1, 1), grid_width)
+                        # Calcul des coordonnées normalisées
+                        cx = (j + self.sigmoid(tx)) / grid_w
+                        cy = (i + self.sigmoid(ty)) / grid_h
 
-            col = col.reshape(grid_height, grid_width, 1, 1).repeat(anchor_boxes, axis=-2)
-            row = row.reshape(grid_height, grid_width, 1, 1).repeat(anchor_boxes, axis=-2)
+                        # Récupération des ancres correspondantes
+                        pw, ph = self.anchors[output_idx][k]
 
-            grid = np.concatenate((col, row), axis=-1)
+                        # Calcul des dimensions de la boîte
+                        bw = pw * np.exp(tw) / input_width
+                        bh = ph * np.exp(th) / input_height
 
-            box_xy = (box_xy + grid) / [grid_width, grid_height]
-            box_wh = box_wh * self.anchors[i].reshape(1, 1, anchor_boxes, 2)
+                        # Conversion finale en coordonnées image
+                        x1 = (cx - bw / 2) * image_size[1]
+                        y1 = (cy - bh / 2) * image_size[0]
+                        x2 = (cx + bw / 2) * image_size[1]
+                        y2 = (cy + bh / 2) * image_size[0]
 
-            box_x1y1 = box_xy - (box_wh / 2)
-            box_x2y2 = box_xy + (box_wh / 2)
+                        boxes_layer[i, j, k] = [x1, y1, x2, y2]
 
-            box_x1y1 = box_x1y1 * [image_width, image_height]
-            box_x2y2 = box_x2y2 * [image_width, image_height]
-
-            boxes.append(np.concatenate((box_x1y1, box_x2y2), axis=-1))
-            box_confidences.append(box_confidence)
-            box_class_probs.append(box_class_prob)
+            # Stockage des résultats pour cette couche
+            boxes.append(boxes_layer)
+            box_confidences.append(self.sigmoid(output[..., 4:5]))
+            box_class_probs.append(self.sigmoid(output[..., 5:]))
 
         return (boxes, box_confidences, box_class_probs)
