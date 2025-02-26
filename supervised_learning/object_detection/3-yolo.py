@@ -107,28 +107,60 @@ class Yolo:
         return filtered_boxes, box_classes, box_scores
 
     def non_max_suppression(self, filtered_boxes, box_classes, box_scores):
-        """Applique la suppression non maximale"""
-        indices = np.argsort(box_scores)[::-1]
+        """
+        Non suppression
+        """
+        def iou(b1, b2):
+            """Calculer l'intersection sur l'union"""
+            (x1, y1, x2, y2) = b1
+            (x1bis, y1bis, x2bis, y2bis) = b2
+
+            xi1 = max(x1, x1bis)
+            y1i = max(y1, y1bis)
+            xi2 = min(x2, x2bis)
+            yi2 = min(y2, y2bis)
+
+            width = max(0, xi2 - xi1)
+            height = max(0, yi2 - y1i)
+
+            inter_area = width * height
+
+            box1_area = (x2 - x1) * (y2 - y1)
+            box2_area = (x2bis - x1bis) * (y2bis - y1bis)
+
+            union_area = box1_area + box2_area - inter_area
+
+            return inter_area / union_area
+
+        unique_classes = np.unique(box_classes)
         box_predictions = []
         predicted_box_classes = []
         predicted_box_scores = []
 
-        while len(indices) > 0:
-            i = indices[0]
-            box_predictions.append(filtered_boxes[i])
-            predicted_box_classes.append(box_classes[i])
-            predicted_box_scores.append(box_scores[i])
+        for cls in unique_classes:
+            cls_mask = box_classes == cls
+            cls_boxes = filtered_boxes[cls_mask]
+            cls_box_scores = box_scores[cls_mask]
 
-            x1 = np.maximum(filtered_boxes[i][0], filtered_boxes[indices[1:]][:, 0])
-            y1 = np.maximum(filtered_boxes[i][1], filtered_boxes[indices[1:]][:, 1])
-            x2 = np.minimum(filtered_boxes[i][2], filtered_boxes[indices[1:]][:, 2])
-            y2 = np.minimum(filtered_boxes[i][3], filtered_boxes[indices[1:]][:, 3])
+            sorted_indices = np.argsort(cls_box_scores)[::-1]
+            cls_boxes = cls_boxes[sorted_indices]
+            cls_box_scores = cls_box_scores[sorted_indices]
 
-            inter_area = np.maximum(0, x2 - x1) * np.maximum(0, y2 - y1)
-            box1_area = (filtered_boxes[i][2] - filtered_boxes[i][0]) * (filtered_boxes[i][3] - filtered_boxes[i][1])
-            box2_area = (filtered_boxes[indices[1:]][:, 2] - filtered_boxes[indices[1:]][:, 0]) * (filtered_boxes[indices[1:]][:, 3] - filtered_boxes[indices[1:]][:, 1])
-            iou = inter_area / (box1_area + box2_area - inter_area)
+            while len(cls_boxes) > 0:
+                box_predictions.append(cls_boxes[0])
+                predicted_box_classes.append(cls)
+                predicted_box_scores.append(cls_box_scores[0])
 
-            indices = indices[1:][iou < 0.5]
+                if len(cls_boxes) == 1:
+                    break
 
-        return np.array(box_predictions), np.array(predicted_box_classes), np.array(predicted_box_scores)
+                ious = np.array([
+                    iou(cls_boxes[0], box) for box in cls_boxes[1:]])
+                cls_boxes = cls_boxes[1:][ious < self.nms_t]
+                cls_box_scores = cls_box_scores[1:][ious < self.nms_t]
+
+        box_predictions = np.array(box_predictions)
+        predicted_box_classes = np.array(predicted_box_classes)
+        predicted_box_scores = np.array(predicted_box_scores)
+
+        return box_predictions, predicted_box_classes, predicted_box_scores
