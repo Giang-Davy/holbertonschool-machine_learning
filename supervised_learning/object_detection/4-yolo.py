@@ -8,8 +8,6 @@ import glob
 import cv2
 
 
-
-
 class Yolo:
     """yolo-v3 model to perform object detection"""
     def __init__(self, model_path, classes_path, class_t, nms_t, anchors):
@@ -168,17 +166,16 @@ class Yolo:
         predicted_box_scores = np.array(predicted_box_scores)
 
         return box_predictions, predicted_box_classes, predicted_box_scores
-    
+
     @staticmethod
     def load_images(folder_path):
         """charger une image """
-
         image_paths = glob.glob(f"{folder_path}/*")
         images = []
-        
+
         for path in image_paths:
             image = cv2.imread(path)
             if image is not None:
                 images.append(image)
-        
+
         return images, image_paths
