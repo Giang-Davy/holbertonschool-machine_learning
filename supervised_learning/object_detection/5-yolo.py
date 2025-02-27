@@ -1,276 +1,199 @@
 #!/usr/bin/env python3
-"""Module pour charger des images depuis un dossier"""
+"""Yolo class for object detection"""
 
-import cv2
-import glob
+
 import numpy as np
-import tensorflow.keras as K
+from tensorflow import keras as K
+import glob
+import cv2
 
 
 class Yolo:
-    """Classe YOLO v3 complète avec correction d'erreur"""
-
+    """yolo-v3 model to perform object detection"""
     def __init__(self, model_path, classes_path, class_t, nms_t, anchors):
+        """
+        Initializes the Yolo class for object detection.
+
+        Args:
+            model_path (str): path to the Darknet Keras model.
+            classes_path (str): path to the file containinges.
+            class_t (float): box score threshold for filtering.
+            nms_t (float): IOU threshold for non-max sup
+            anchors (np.ndarray): array of anchor boxes ofts
+        """
         self.model = K.models.load_model(model_path)
         with open(classes_path, 'r') as f:
-            self.class_names = [line.strip() for line in f]
+            self.class_names = [line.strip() for line in f.readlines()]
         self.class_t = class_t
         self.nms_t = nms_t
         self.anchors = anchors
 
-    def sigmoid(self, x):
-        """Fonction sigmoïde vectorisée"""
-        return 1 / (1 + np.exp(-x))
-
     def process_outputs(self, outputs, image_size):
         """
-        Traitement des sorties du réseau avec correction de l'erreur .value
+        Process the outputs from the Darknet model.
+
+        Args:
+            outputs (list): list of numpy.ndarrays coimage.
+            image_size (np.ndarray): array containin, image_width].
+
+        Returns:
+            tuple: (boxes, box_confidences, box_class_probs)
         """
         boxes = []
         box_confidences = []
         box_class_probs = []
 
-        input_width = self.model.input.shape[1]
-        input_height = self.model.input.shape[2]
+        image_height, image_width = image_size
 
-        for output_idx, output in enumerate(outputs):
-            grid_h, grid_w, nb_ancres, _ = output.shape
+        for i, output in enumerate(outputs):
+            grid_height, grid_width, anchor_boxes, _ = output.shape
 
-            # Initialisation des tableaux de sortie
-            boxes_layer = np.zeros((grid_h, grid_w, nb_ancres, 4))
+            box_xy = 1 / (1 + np.exp(-output[..., :2]))
+            box_wh = np.exp(output[..., 2:4]) * self.anchors[i]
+            box_confidence = 1 / (1 + np.exp(-output[..., 4:5]))
+            box_class_prob = 1 / (1 + np.exp(-output[..., 5:]))
 
-            for i in range(grid_h):
-                for j in range(grid_w):
-                    for k in range(nb_ancres):
-                        tx, ty, tw, th = output[i, j, k, :4]
+            col = np.tile(
+                np.arange(0, grid_width), grid_height).reshape(-1, grid_width)
+            row = np.tile(np.arange(0, grid_height).reshape(-1, 1), grid_width)
 
-                        # Calcul des coordonnées normalisées
-                        cx = (j + self.sigmoid(tx)) / grid_w
-                        cy = (i + self.sigmoid(ty)) / grid_h
+            col = col.reshape(grid_height, grid_width, 1, 1).repeat(3, axis=-2)
+            row = row.reshape(grid_height, grid_width, 1, 1).repeat(3, axis=-2)
 
-                        # Récupération des ancres correspondantes
-                        pw, ph = self.anchors[output_idx][k]
+            box_xy += np.concatenate((col, row), axis=-1)
+            box_xy /= (grid_width, grid_height)
+            box_wh /= (self.model.input.shape[1], self.model.input.shape[2])
 
-                        # Calcul des dimensions de la boîte
-                        bw = pw * np.exp(tw) / input_width
-                        bh = ph * np.exp(th) / input_height
+            box_xy -= (box_wh / 2)
+            box_xy1 = box_xy * (image_width, image_height)
+            box_xy2 = (box_xy + box_wh) * (image_width, image_height)
+            box = np.concatenate((box_xy1, box_xy2), axis=-1)
 
-                        # Conversion finale en coordonnées image
-                        x1 = (cx - bw / 2) * image_size[1]
-                        y1 = (cy - bh / 2) * image_size[0]
-                        x2 = (cx + bw / 2) * image_size[1]
-                        y2 = (cy + bh / 2) * image_size[0]
+            boxes.append(box)
+            box_confidences.append(box_confidence)
+            box_class_probs.append(box_class_prob)
 
-                        boxes_layer[i, j, k] = [x1, y1, x2, y2]
-
-            # Stockage des résultats pour cette couche
-            boxes.append(boxes_layer)
-            box_confidences.append(self.sigmoid(output[..., 4:5]))
-            box_class_probs.append(self.sigmoid(output[..., 5:]))
-
-        return (boxes, box_confidences, box_class_probs)
+        return boxes, box_confidences, box_class_probs
 
     def filter_boxes(self, boxes, box_confidences, box_class_probs):
-        """
-        Filtre les boîtes selon les scores de classe et calcule
-        les scores finaux
-
-        Args:
-            boxes: Liste de tableaux numpy des coordonnées des boîtes
-            box_confidences: Liste de tableaux numpy des confiances
-            box_class_probs: Liste de tableaux numpy des probabilités de classe
-
-        Returns:
-            Tuple (filtered_boxes, filtered_classes, filtered_scores)
-        """
+        """boîte de filtre"""
         filtered_boxes = []
-        filtered_classes = []
-        filtered_scores = []
+        box_classes = []
+        box_scores = []
 
-        # Pour chaque couche de sortie (13x13, 26x26, 52x52)
-        for box_layer, conf_layer, prob_layer in zip(
-                boxes, box_confidences, box_class_probs):
-            # Aplatir les tableaux pour simplifier le traitement
-            box_flat = box_layer.reshape(-1, 4)
-            conf_flat = conf_layer.reshape(-1)
-            prob_flat = prob_layer.reshape(-1, len(self.class_names))
+        for box, box_conf, box_class_prob in zip(boxes,
+                                                 box_confidences,
+                                                 box_class_probs):
+            grid_height, grid_width, anchor_boxes, _ = box.shape
 
-            # Étape 1 : Trouver la classe dominante et son score
-            class_indices = np.argmax(prob_flat, axis=1)
-            class_scores = np.max(prob_flat, axis=1)
-            final_scores = conf_flat * class_scores
+            # Calculer les scores des boîtes
+            box_score = box_conf * box_class_prob
 
-            # Étape 2 : Filtrer par seuil de confiance
-            mask = final_scores >= self.class_t
-            filtered_boxes.extend(box_flat[mask])
-            filtered_classes.extend(class_indices[mask])
-            filtered_scores.extend(final_scores[mask])
+            # Trouver les classes et les scores maximaux pour chaque boîte
+            box_class = np.argmax(box_score, axis=-1)
+            box_class_score = np.max(box_score, axis=-1)
 
-        return (
-            np.array(filtered_boxes),
-            np.array(filtered_classes),
-            np.array(filtered_scores)
-        )
+            # Appliquer un masque de filtrage basé sur un seuil de score
+            filtering_mask = box_class_score >= 0.6
+
+            # Filtrer les boîtes, les classes et les scores
+            filtered_boxes.append(box[filtering_mask])
+            box_classes.append(box_class[filtering_mask])
+            box_scores.append(box_class_score[filtering_mask])
+
+        # Convertir les listes en numpy.ndarrays
+        filtered_boxes = np.concatenate(filtered_boxes, axis=0)
+        box_classes = np.concatenate(box_classes, axis=0)
+        box_scores = np.concatenate(box_scores, axis=0)
+
+        return filtered_boxes, box_classes, box_scores
 
     def non_max_suppression(self, filtered_boxes, box_classes, box_scores):
         """
-        Applique la suppression non-maximale pour filtrer les boîtes
-        superposées
-
-        Args:
-            filtered_boxes (np.ndarray): Boîtes filtrées shape (N,4)
-            box_classes (np.ndarray): Classes des boîtes shape (N,)
-            box_scores (np.ndarray): Scores des boîtes shape (N,)
-
-        Returns:
-            tuple: (boîtes_finales, classes_finales, scores_finals)
+        Non suppression
         """
-        selected_indices = []
+        def iou(b1, b2):
+            """Calculer l'intersection sur l'union"""
+            (x1, y1, x2, y2) = b1
+            (x1bis, y1bis, x2bis, y2bis) = b2
 
-        # Parcours chaque classe unique triée
-        for cls in np.unique(box_classes):
-            # Masque pour la classe courante
+            xi1 = max(x1, x1bis)
+            y1i = max(y1, y1bis)
+            xi2 = min(x2, x2bis)
+            yi2 = min(y2, y2bis)
+
+            width = max(0, xi2 - xi1)
+            height = max(0, yi2 - y1i)
+
+            inter_area = width * height
+
+            box1_area = (x2 - x1) * (y2 - y1)
+            box2_area = (x2bis - x1bis) * (y2bis - y1bis)
+
+            union_area = box1_area + box2_area - inter_area
+
+            return inter_area / union_area
+
+        unique_classes = np.unique(box_classes)
+        box_predictions = []
+        predicted_box_classes = []
+        predicted_box_scores = []
+
+        for cls in unique_classes:
             cls_mask = box_classes == cls
-            cls_indices = np.where(cls_mask)[0]
+            cls_boxes = filtered_boxes[cls_mask]
+            cls_box_scores = box_scores[cls_mask]
 
-            if len(cls_indices) == 0:
-                continue
+            sorted_indices = np.argsort(cls_box_scores)[::-1]
+            cls_boxes = cls_boxes[sorted_indices]
+            cls_box_scores = cls_box_scores[sorted_indices]
 
-            # Tri par score décroissant
-            sorted_scores_idx = np.argsort(-box_scores[cls_indices])
-            sorted_indices = cls_indices[sorted_scores_idx]
+            while len(cls_boxes) > 0:
+                box_predictions.append(cls_boxes[0])
+                predicted_box_classes.append(cls)
+                predicted_box_scores.append(cls_box_scores[0])
 
-            while len(sorted_indices) > 0:
-                # Sélectionne la boîte avec le score le plus haut
-                current_idx = sorted_indices[0]
-                selected_indices.append(current_idx)
-
-                if len(sorted_indices) == 1:
+                if len(cls_boxes) == 1:
                     break
 
-                # Calcul IoU avec les autres boîtes
-                current_box = filtered_boxes[current_idx]
-                other_boxes = filtered_boxes[sorted_indices[1:]]
+                ious = np.array([
+                    iou(cls_boxes[0], box) for box in cls_boxes[1:]])
+                cls_boxes = cls_boxes[1:][ious < self.nms_t]
+                cls_box_scores = cls_box_scores[1:][ious < self.nms_t]
 
-                # Calcul des coordonnées d'intersection
-                x1 = np.maximum(current_box[0], other_boxes[:, 0])
-                y1 = np.maximum(current_box[1], other_boxes[:, 1])
-                x2 = np.minimum(current_box[2], other_boxes[:, 2])
-                y2 = np.minimum(current_box[3], other_boxes[:, 3])
+        box_predictions = np.array(box_predictions)
+        predicted_box_classes = np.array(predicted_box_classes)
+        predicted_box_scores = np.array(predicted_box_scores)
 
-                intersection = np.maximum(0, x2 - x1) * np.maximum(0, y2 - y1)
-                area_current = (
-                    (current_box[2] - current_box[0]) *
-                    (current_box[3] - current_box[1])
-                )
-                area_others = (
-                    (other_boxes[:, 2] - other_boxes[:, 0]) *
-                    (other_boxes[:, 3] - other_boxes[:, 1])
-                )
-                union = area_current + area_others - intersection
-
-                # Évite la division par zéro
-                iou = intersection / (union + 1e-6)
-
-                # Filtrage des boîtes trop proches
-                keep_mask = iou <= self.nms_t
-                sorted_indices = sorted_indices[1:][keep_mask]
-
-        if not selected_indices:
-            return np.array([]), np.array([]), np.array([])
-
-        # Extraction des résultats
-        selected_indices = np.array(selected_indices)
-        return (
-            filtered_boxes[selected_indices],
-            box_classes[selected_indices],
-            box_scores[selected_indices]
-        )
+        return box_predictions, predicted_box_classes, predicted_box_scores
 
     @staticmethod
     def load_images(folder_path):
-        """
-        Charge toutes les images d'un dossier donné.
-
-        Args:
-            folder_path (str): Chemin vers le dossier contenant les images.
-
-        Returns:
-            tuple: (images, image_paths)
-                - images: Liste de numpy.ndarray représentant
-                les images chargées.
-                - image_paths: Liste des chemins complets vers chaque image.
-        """
-        # Initialisation des listes
+        """charger une image """
+        image_paths = glob.glob(f"{folder_path}/*")
         images = []
-        image_paths = []
 
-        # Parcours des fichiers dans le dossier
-        for file_path in glob.glob(f"{folder_path}/*"):
-            # Charger l'image avec OpenCV
-            image = cv2.imread(file_path)
-            if image is not None:  # Vérifier que l'image est valide
+        for path in image_paths:
+            image = cv2.imread(path)
+            if image is not None:
                 images.append(image)
-                image_paths.append(file_path)
-
-        # Vérifier si aucune image n'a été trouvée
-        if len(images) == 0:
-            raise ValueError(
-                f"Aucune image valide trouvée dans le dossier : {folder_path}"
-            )
 
         return images, image_paths
 
     def preprocess_images(self, images):
-        """
-        Prétraite une liste d'images pour le modèle YOLO.
+        """Preprocess images"""
+        processed_images = []
+        original_images = []
 
-        Args:
-            images (list): Liste d'images sous forme de numpy.ndarray.
-
-        Returns:
-            tuple: (pimages, image_shapes)
-                - pimages: numpy.ndarray contenant toutes
-                les images prétraitées.
-                - image_shapes: numpy.ndarray contenant les
-                dimensions originales de chaque image sous
-                forme (hauteur, largeur).
-        """
-        # Récupérer la taille d'entrée du modèle
-        input_w = self.model.input.shape[1]
-        input_h = self.model.input.shape[2]
-
-        # Initialisation des listes pour stocker les résultats
-        lpimages = []
-        limage_shapes = []
-
-        for img in images:
-            # Sauvegarder la taille originale de l'image
-            img_shape = img.shape[0], img.shape[1]
-            limage_shapes.append(img_shape)
-
-            # Redimensionner l'image à la taille du modèle
-            dimension = (input_w, input_h)
-            resized = cv2.resize(img, dimension, interpolation=cv2.INTER_CUBIC)
-
-            # Normaliser les pixels entre 0 et 1
-            pimage = resized / 255.0
-
-            # Ajouter l'image prétraitée à la liste
-            lpimages.append(pimage)
-
-        # Convertir en tableaux NumPy
-        pimages = np.array(lpimages)
-        image_shapes = np.array(limage_shapes)
-
-        return pimages, image_shapes
-
-
-
-
-
-
-
-
-
-
+        for image in images:
+            if image is not None:
+                original = image.shape[:2]
+                resized_image = cv2.resize(
+                    image,
+                    (self.model.input.shape[1], self.model.input.shape[2]),
+                    interpolation=cv2.INTER_CUBIC
+                )
+                normalized_image = resized_image / 255.0
+                processed_images.append(normalized_image)
+                original_images.append(original)
+        return np.array(processed_images), np.array(original_images)
