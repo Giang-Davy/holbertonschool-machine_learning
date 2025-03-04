@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
-from tensorflow as tf
+import tensorflow as tf
 
 
 class NST:
