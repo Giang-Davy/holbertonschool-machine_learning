@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Fonction pour le transfert de style neural"""
 
+
 import tensorflow as tf
 import numpy as np
 
 
 class NST:
+    """Neurone-Style-Transfert"""
     style_layers = [
         'block1_conv1',
         'block2_conv1',
@@ -24,7 +26,8 @@ class NST:
                 "style_image must be a numpy.ndarray with shape (h, w, 3)"
             )
         if not (
-            isinstance(content_image, np.ndarray) and content_image.shape[-1] == 3
+            isinstance(content_image, np.ndarray)
+            and content_image.shape[-1] == 3
         ):
             raise TypeError(
                 "content_image must be a numpy.ndarray with shape (h, w, 3)"
