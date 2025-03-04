@@ -16,6 +16,8 @@ class NST:
     content_layer = 'block5_conv2'
 
     def __init__(self, style_image, content_image, alpha=1e4, beta=1):
+        """initialisation"""
+        a = -1
         if not (
             isinstance(style_image, np.ndarray) and style_image.shape[-1] == 3
         ):
@@ -24,6 +26,7 @@ class NST:
             )
         if not (
             isinstance(content_image, np.ndarray)
+            or content_image.shape[a] != 3
         ):
             raise TypeError(
                 "content_image must be a numpy.ndarray with shape (h, w, 3)"
