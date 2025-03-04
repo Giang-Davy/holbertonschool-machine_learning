@@ -23,7 +23,9 @@ class NST:
             raise TypeError(
                 "style_image must be a numpy.ndarray with shape (h, w, 3)"
             )
-        if not (isinstance(content_image, np.ndarray) or content_image.shape[-1] != 3):
+        if not (
+            isinstance(content_image, np.ndarray) and content_image.shape[-1] == 3
+        ):
             raise TypeError(
                 "content_image must be a numpy.ndarray with shape (h, w, 3)"
             )
