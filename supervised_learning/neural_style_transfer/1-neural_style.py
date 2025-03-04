@@ -71,7 +71,8 @@ class NST:
     def load_model(self):
         """charger un modèle"""
 
-        model = tf.keras.applications.vgg19.VGG19(weights='imagenet')
+        model = tf.keras.applications.vgg19.VGG19(
+            include_top=False, weights='imagenet')
         model.trainable = False
         style_outputs = [
             model.get_layer(name).output for name in self.style_layers]
