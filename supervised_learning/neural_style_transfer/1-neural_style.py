@@ -69,14 +69,29 @@ class NST:
         return resized_image[tf.newaxis, ...]
 
     def load_model(self):
-        """charger un modèle"""
+        # Keras API
+        modelVGG19 = tf.keras.applications.VGG19(
+                include_top=False,
+                weights='imagenet'
+                )
 
-        model = tf.keras.applications.vgg19.VGG19(
-            include_top=False, weights='imagenet')
-        model.trainable = False
-        style_outputs = [
-            model.get_layer(name).output for name in self.style_layers]
-        content_outputs = [model.get_layer(self.content_layer).output]
-        model_outputs = style_outputs + content_outputs
+        modelVGG19.trainable = False
 
-        return tf.keras.Model(model.input, model_outputs)
+        # selected layers
+        selected_layers = self.style_layers + [self.content_layer]
+
+        outputs = [
+                modelVGG19.get_layer(name).output for name in selected_layers
+                ]
+
+        # construct model
+        model = tf.keras.Model([modelVGG19.input], outputs)
+
+        # for replace MaxPooling layer by AveragePooling layer
+        custom_objects = {'MaxPooling2D': tf.keras.layers.AveragePooling2D}
+        tf.keras.models.save_model(model, 'vgg_base.h5')
+        model_avg = tf.keras.models.load_model(
+                'vgg_base.h5', custom_objects=custom_objects
+                )
+
+        self.model = model_avg
