@@ -43,6 +43,7 @@ class NST:
         resized_image = tf.image.resize(image, (h_new, w_new), method='bicubic')
 
         # Convertir en float32 et normaliser
-        resized_image = tf.cast(resized_image, tf.float32) / 255.0  
+        resized_image = tf.cast(resized_image, tf.float32) / 255.0
+        resized_image = tf.clip_by_value(resized_image, 0.0, 1.0)
 
         return resized_image[tf.newaxis, ...]
