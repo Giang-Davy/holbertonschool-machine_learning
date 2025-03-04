@@ -28,7 +28,6 @@ class NST:
 
     @staticmethod
     def scale_image(image):
-        """Redimensionne l'image en ajustant le plus grand côté à 512 pixels et garde les valeurs en int."""
         if not isinstance(image, np.ndarray) or image.shape[-1] != 3:
             raise TypeError("image must be a numpy.ndarray with shape (h, w, 3)")
 
@@ -41,10 +40,9 @@ class NST:
             w_new = 512
             h_new = int((height / width) * 512)
 
-        # Redimensionnement avec interpolation bicubique
         resized_image = tf.image.resize(image, (h_new, w_new), method='bicubic')
 
-        # Conversion en entier (0-255)
-        resized_image = tf.cast(tf.round(resized_image), tf.uint8)
+        # Convertir en float32 et normaliser
+        resized_image = tf.cast(resized_image, tf.float32) / 255.0  
 
-        return resized_image[tf.newaxis, ...]  # Retourne le tensor avec batch size 1
+        return resized_image[tf.newaxis, ...]
