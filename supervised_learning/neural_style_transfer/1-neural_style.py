@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Fonction pour le transfert de style neural"""
 
+
 import tensorflow as tf
 import numpy as np
+
 
 class NST:
     """Neurone-Style-Transfert"""
@@ -77,12 +79,14 @@ class NST:
     def load_model(self):
         """Creates the model used to calculate cost"""
         # Load the VGG19 model
-        modelVGG19 = tf.keras.applications.VGG19(include_top=False, weights='imagenet')
+        modelVGG19 = tf.keras.applications.VGG19(
+            include_top=False, weights='imagenet')
         modelVGG19.trainable = False
 
         # Select the layers
         selected_layers = self.style_layers + [self.content_layer]
-        outputs = [modelVGG19.get_layer(name).output for name in selected_layers]
+        outputs = [
+            modelVGG19.get_layer(name).output for name in selected_layers]
 
         # Construct the model
         model = tf.keras.Model([modelVGG19.input], outputs)
@@ -90,6 +94,7 @@ class NST:
         # Replace MaxPooling layers with AveragePooling layers
         custom_objects = {'MaxPooling2D': tf.keras.layers.AveragePooling2D}
         tf.keras.models.save_model(model, 'vgg_base.h5')
-        model_avg = tf.keras.models.load_model('vgg_base.h5', custom_objects=custom_objects)
+        model_avg = tf.keras.models.load_model(
+            'vgg_base.h5', custom_objects=custom_objects)
 
         self.model = model_avg
