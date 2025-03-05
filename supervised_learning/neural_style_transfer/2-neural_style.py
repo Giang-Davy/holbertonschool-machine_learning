@@ -102,8 +102,8 @@ class NST:
     @staticmethod
     def gram_matrix(input_layer):
         """calcul matrix"""
-        if not isinstance(input_layer, (tf.Tensor, tf.Variable))
-        or len(input_layer.shape) != 4:
+        if not (isinstance(input_layer, (tf.Tensor, tf.Variable))
+                or len(input_layer.shape) != 4):
             raise TypeError("input_layer must be a tensor of rank 4")
 
         # Décomposer les dimensions
