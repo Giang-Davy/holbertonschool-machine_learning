@@ -102,7 +102,10 @@ class NST:
     @staticmethod
     def gram_matrix(input_layer):
         """calcul matrix"""
-        if not isinstance(input_layer, (tf.Tensor, tf.Variable)) or len(input_layer.shape) != 4:
+        if not (
+            isinstance(input_layer, (tf.Tensor, tf.Variable))
+            and len(input_layer.shape) == 4
+        ):
             raise TypeError("input_layer must be a tensor of rank 4")
 
         # Décomposer les dimensions
@@ -116,7 +119,8 @@ class NST:
 
         # Calcul de la matrice de Gram
         gram_matrix = tf.linalg.matmul(
-            reshaped_input, reshaped_input, transpose_a=True)
+            reshaped_input, reshaped_input, transpose_a=True
+        )
 
         # Ajouter la dimension du batch pour obtenir (1, c, c)
         gram_matrix = tf.expand_dims(gram_matrix, axis=0)
