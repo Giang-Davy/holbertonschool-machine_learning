@@ -111,6 +111,9 @@ class NST:
         # Reshaper l'entrée pour obtenir une matrice (h * w, c)
         reshaped_input = tf.reshape(input_layer, (-1, c))
         
+        # Normaliser l'entrée
+        reshaped_input = reshaped_input / tf.sqrt(tf.cast(h * w, tf.float32))
+        
         # Calcul de la matrice de Gram
         gram_matrix = tf.linalg.matmul(reshaped_input, reshaped_input, transpose_a=True)
         
