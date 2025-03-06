@@ -161,26 +161,16 @@ class NST:
             isinstance(gram_target, (tf.Tensor, tf.Variable))
             and gram_target.shape == (1, c, c)
         ):
-            raise TypeError(f"gram_target must be a tensor of shape [1, {c}, {c}]")
+            raise TypeError(
+                f"gram_target must be a tensor of shape [1, {c}, {c}]")
 
         _, c_gram, c_gram2 = gram_target.shape  # Extraire `c_gram`
-        
+
         if c_gram != c or c_gram2 != c:
-            raise TypeError(f"gram_target must be a tensor of shape [1, {c}, {c}]")
+            raise TypeError(
+                f"gram_target must be a tensor of shape [1, {c}, {c}]")
 
-        # Aplatir les dimensions spatiales (h, w)
-        style_reshaped = tf.reshape(style_output, (batch_size, h * w, c))
-
-        # Normaliser la matrice de Gram
-        style_reshaped = style_reshaped / tf.sqrt(tf.cast(h * w, tf.float32))
-
-        # Calculer la matrice de Gram : produit matriciel
-        gram_style = tf.linalg.matmul(style_reshaped, style_reshaped, transpose_a=True)
-
-        # Normaliser la matrice de Gram
-        gram_style = gram_style / (h * w)
-
-        # Calculer la différence au carré entre les matrices de Gram
-        style_cost = tf.reduce_sum(tf.square(gram_style - gram_target))
+        gram_style = self.gram_matrix(style_output)
+        style_cost = tf.reduce_mean(tf.square(gram_style - gram_target))
 
         return style_cost
