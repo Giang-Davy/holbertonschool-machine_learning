@@ -182,7 +182,7 @@ class NST:
         ):
             raise TypeError(
                     "style_outputs must be a list with a length of {}"
-                    .format(len_style_layer)
+                    .format(len(self.style_layers))
             )
 
         total_cost = 0
