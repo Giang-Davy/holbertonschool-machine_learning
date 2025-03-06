@@ -177,17 +177,20 @@ class NST:
 
     def style_cost(self, style_outputs):
         """coût du style total"""
-        if not isinstance(style_outputs, list)
-        or len(style_outputs) != len(self.style_layers):
+        if not isinstance(style_outputs, list) or len(style_outputs) != len(
+            self.style_layers
+        ):
             raise TypeError(
-                f"style_outputs must be a list with a length of {len(
-                    self.style_layers)}")
+                    "style_outputs must be a list with a length of {}"
+                    .format(len_style_layer)
+            )
 
         total_cost = 0
-        weight = 1 / len(self.style_layers)
+        weight = 1 / len(self.style_layers)  # Poids égal pour chaque couche
 
-        for style_output, gram_target
-        in zip(style_outputs, self.gram_style_features):
+        for style_output, gram_target in zip(
+            style_outputs, self.gram_style_features
+        ):
             total_cost += weight * self.layer_style_cost(
                 style_output, gram_target)
 
