@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Fonction pour le transfert de style neural"""
 
+
 import tensorflow as tf
 import numpy as np
+
 
 class NST:
     """Neurone-Style-Transfert"""
@@ -47,9 +49,9 @@ class NST:
             self.beta = beta
 
         self.model = None
-        self.load_model()
         self.gram_style_features = None
         self.content_feature = None
+        self.load_model()
         self.generate_features()
 
     @staticmethod
@@ -129,12 +131,18 @@ class NST:
         return gram_matrix
 
     def generate_features(self):
-        """extraction du style et du contenu"""
-        style_outputs = self.model(self.style_image)
-        content_outputs = self.model(self.content_image)
+        """Extracts the features used to calculate neural style cost"""
+        # Preprocess the images
+        style_image = tf.keras.applications.vgg19.preprocess_input(
+            self.style_image * 255)
+        content_image = tf.keras.applications.vgg19.preprocess_input(
+            self.content_image * 255)
 
-        gram_style_features = [self.gram_matrix(output) for output in style_outputs[:-1]]
-        content_feature = content_outputs[-1]
+        # Get the style and content features
+        style_outputs = self.model(style_image)
+        content_output = self.model(content_image)
 
-        self.gram_style_features = gram_style_features
-        self.content_feature = content_feature
+        # Calculate the gram matrices for the style features
+        self.gram_style_features = [
+            self.gram_matrix(output) for output in style_outputs[:-1]]
+        self.content_feature = content_output[-1]
