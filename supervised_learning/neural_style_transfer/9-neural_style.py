@@ -256,8 +256,7 @@ class NST:
 
         return gradients, J_total, J_content, J_style
 
-    def generate_image(self, iterations=1000,
-                       step=None, lr=0.01, beta1=0.9, beta2=0.99):
+    def generate_image(self, iterations=1000, step=None, lr=0.01, beta1=0.9, beta2=0.99):
         """image générée"""
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
@@ -306,6 +305,9 @@ class NST:
                 message += f"content {J_content}, "
                 message += f"style {J_style}"
                 print(message)
+
+            # Debugging information
+            print(f"Iteration {i}: J_total={J_total}, J_content={J_content}, J_style={J_style}")
 
         best_image = best_image[0]
         best_image = tf.clip_by_value(best_image, 0, 1)
