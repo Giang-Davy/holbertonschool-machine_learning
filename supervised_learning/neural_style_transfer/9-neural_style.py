@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fonction pur le transfert de style neural"""
+"""Fonction pour le transfert de style neural"""
 
 
 import numpy as np
@@ -301,7 +301,7 @@ class NST:
                 best_cost = float(J_total)
                 best_image = generated_image
 
-            if step is not None and i % step == 0:
+            if step is not None and (i % step == 0 or i == iterations):
                 message = f"Cost at iteration {i}: {J_total}, "
                 message += f"content {J_content}, "
                 message += f"style {J_style}"
