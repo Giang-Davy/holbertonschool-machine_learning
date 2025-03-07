@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """Fonction pour le transfert de style neural"""
 
-
 import numpy as np
 import tensorflow as tf
-
 
 class NST:
     """Neurone-Style-Transfert"""
