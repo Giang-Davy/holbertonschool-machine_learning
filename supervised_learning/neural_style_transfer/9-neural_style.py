@@ -308,4 +308,11 @@ class NST:
                 message += f"style {J_style}"
                 print(message)
 
+        best_image = np.squeeze(best_image, axis=0)
+        print(best_image.shape)
+        print(best_image.min(), best_image.max())
+        print(np.allclose(best_image.min(), 0.0, atol=1e-5))
+        print(np.allclose(best_image.max(), 1.0, atol=1e-5))
+        print(np.allclose(best_image.shape, (256, 512, 3)))
+
         return best_image, best_cost
