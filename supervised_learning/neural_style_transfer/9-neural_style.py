@@ -282,29 +282,33 @@ class NST:
         if not (0 <= beta2 <= 1):
             raise ValueError("beta2 must be in the range [0, 1]")
 
-        generated_image = tf.Variable(self.content_image, dtype=tf.float32)
+        generated_image = tf.Variable(self.content_image)
         optimizer = tf.optimizers.Adam(
             learning_rate=lr, beta_1=beta1, beta_2=beta2)
 
         best_cost = float('inf')
         best_image = None
 
-        for i in range(iterations):
+        for i in range(iterations + 1):
             with tf.GradientTape() as tape:
-                J_total, J_content, J_style = self.total_cost(
+                grads, J_total, J_content, J_style = self.compute_grads(
                     generated_image)
-            gradients = tape.gradient(J_total, generated_image)
-            optimizer.apply_gradients([(gradients, generated_image)])
+            optimizer.apply_gradients([(grads, generated_image)])
             generated_image.assign(
                 tf.clip_by_value(generated_image, 0.0, 1.0))
 
             if J_total < best_cost:
-                best_cost = J_total
-                best_image = generated_image.numpy()
+                best_cost = float(J_total)
+                best_image = generated_image
 
-            if step and (i + 1) % step == 0:
-                print(f"Iteration {i+1}: Coût={J_total}, "
-                      f"Contenu={J_content}, Style={J_style}")
-        
+            if step is not None and i % step == 0:
+                message = f"Cost at iteration {i}: {J_total}, "
+                message += f"content {J_content}, "
+                message += f"style {J_style}"
+                print(message)
 
-        return best_image[0], best_cost
+        best_image = best_image[0]
+        best_image = tf.clip_by_value(best_image, 0, 1)
+        best_image = best_image.numpy()
+
+        return best_image, best_cost
