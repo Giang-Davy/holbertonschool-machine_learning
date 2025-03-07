@@ -303,9 +303,8 @@ class NST:
                 best_image = generated_image.numpy()
 
             if step is not None and i % step == 0:
-                message = f"Cost at iteration {i}: {J_total}, "
-                message += f"content {J_content}, "
-                message += f"style {J_style}"
+                message = f"Cost at iteration {i}: {J_total}, content {J_content},"
+                message += f" style {J_style}"
                 print(message)
 
         return best_image, best_cost
