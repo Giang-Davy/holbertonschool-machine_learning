@@ -302,17 +302,9 @@ class NST:
                 best_cost = J_total
                 best_image = generated_image.numpy()
 
-            if step is not None and i % step == 0:
-                message = f"Cost at iteration {i}: {J_total}, "
-                message += f"content {J_content}, "
-                message += f"style {J_style}"
-                print(message)
+            if step and (i + 1) % step == 0:
+                print(f"Iteration {i+1}: Coût={J_total}, "
+                      f"Contenu={J_content}, Style={J_style}")
+        
 
-        best_image = np.squeeze(best_image, axis=0)
-        print(best_image.shape)
-        print(best_image.min(), best_image.max())
-        print(np.allclose(best_image.min(), 0.0, atol=1e-5))
-        print(np.allclose(best_image.max(), 1.0, atol=1e-5))
-        print(np.allclose(best_image.shape, (256, 512, 3)))
-
-        return best_image, best_cost
+        return best_image[0], best_cost
