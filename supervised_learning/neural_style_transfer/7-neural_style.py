@@ -2,8 +2,8 @@
 """Fonction pour le transfert de style neural"""
 
 
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 
 
 class NST:
