@@ -96,12 +96,9 @@ class NST:
 
         # Replace MaxPooling layers with AveragePooling layers
         custom_objects = {'MaxPooling2D': tf.keras.layers.AveragePooling2D}
-        tf.keras.models.save_model(model, 'vgg_base.keras')
+        tf.keras.models.save_model(model, 'vgg_base.h5')
         model_avg = tf.keras.models.load_model(
-            'vgg_base.keras', custom_objects=custom_objects)
-
-        # Compile the model
-        model_avg.compile()
+            'vgg_base.h5', custom_objects=custom_objects)
 
         self.model = model_avg
 
@@ -239,7 +236,6 @@ class NST:
         J = self.alpha * J_content + self.beta * J_style
 
         return (J, J_content, J_style)
-
     def compute_grads(self, generated_image):
         """Calculates the gradients for the generated image"""
         if not isinstance(generated_image, (tf.Tensor, tf.Variable)):
@@ -252,8 +248,9 @@ class NST:
                 .format(self.content_image.shape))
 
         with tf.GradientTape() as tape:
+            tape.watch(generated_image)
             J_total, J_content, J_style = self.total_cost(generated_image)
-
+    
         gradients = tape.gradient(J_total, generated_image)
-
+    
         return gradients, J_total, J_content, J_style
