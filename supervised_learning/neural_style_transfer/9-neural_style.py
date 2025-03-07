@@ -256,25 +256,36 @@ class NST:
 
         return gradients, J_total, J_content, J_style
 
-    def generate_image(self, iterations=1000, step=None, lr=0.01,
-                       beta1=0.9, beta2=0.99):
+    def generate_image(self, iterations=1000, step=None, lr=0.01, beta1=0.9, beta2=0.99):
         """
-            generated_image is the generated image.
-            cost is the cost of the generated image.
+            method to generate the neural style transfered image
+            Grad descent : adam opt
+
+        :param iterations: number of iterations to perform gradient descent
+        :param step: None or the step print information:
+                    print Cost at iteration {i}: {J_total}, content {J_content}, style {J_style}
+                    i is the iteration
+                    J_total is the total cost
+                    J_content is the content cost
+                    J_style is the style cost
+        :param lr: learning rate for gradient descent
+        :param beta1: beta1 for gradient descent
+        :param beta2: beta2 for gradient descent
+
+        :return: best generated_image, best cost
         """
+
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
-        if iterations <= 0:
+        if iterations < 1:
             raise ValueError("iterations must be positive")
-        if step is not None:
-            if not isinstance(step, int):
-                raise TypeError("step must be an integer")
-            if step <= 0 or step >= iterations:
-                raise ValueError(
-                    "step must be positive and less than iterations")
-        if not isinstance(lr, (int, float)):
+        if step is not None and not isinstance(step, int):
+            raise TypeError("step must be an integer")
+        if step is not None and (step < 0 or step > iterations):
+            raise ValueError("step must be positive and less than iterations")
+        if not isinstance(lr, (float, int)):
             raise TypeError("lr must be a number")
-        if lr <= 0:
+        if lr < 0:
             raise ValueError("lr must be positive")
         if not isinstance(beta1, float):
             raise TypeError("beta1 must be a float")
@@ -285,26 +296,37 @@ class NST:
         if beta2 < 0 or beta2 > 1:
             raise ValueError("beta2 must be in the range [0, 1]")
 
-        optimizer = tf.optimizers.Adam(learning_rate=lr, beta_1=beta1,
-                                       beta_2=beta2)
+        # intialize image
         generated_image = tf.Variable(self.content_image)
+
+        # intialize best cost and best image
         best_cost = float('inf')
         best_image = None
 
+        # Initialize Adam
+        optimizer = tf.optimizers.Adam(lr, beta1, beta2)
+
+        # Optimization loop
         for i in range(iterations + 1):
-            with tf.GradientTape() as tape:
-                grads, J_total, J_content, J_style = self.compute_grads(
-                    generated_image)
+            # compute gradients and costs
+            grads, J_total, J_content, J_style = self.compute_grads(generated_image)
 
+            # use opt
             optimizer.apply_gradients([(grads, generated_image)])
-            generated_image.assign(tf.clip_by_value(generated_image, 0, 1))
 
-            if step is not None and i % step == 0:
-                print(f"Cost at iteration {i}: {J_total.numpy()}, \
-content {J_content.numpy()}, style {J_style.numpy()}")
-
+            # selected best cost and best image
             if J_total < best_cost:
-                best_cost = J_total
-                prev_image = generated_image
-        best_image = prev_image[0]
-        return best_image.numpy(), best_cost.numpy()
+                best_cost = float(J_total)
+                best_image = generated_image
+
+            # Print step required
+            if step is not None and (i % step == 0 or i == iterations):
+                print("Cost at iteration {}: {}, content {}, style {}"
+                      .format(i, J_total, J_content, J_style))
+
+        # remove sup dim
+        best_image = best_image[0]
+        best_image = tf.clip_by_value(best_image, 0, 1)
+        best_image = best_image.numpy()
+
+        return best_image, best_cost
