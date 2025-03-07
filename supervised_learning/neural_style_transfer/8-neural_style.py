@@ -236,7 +236,7 @@ class NST:
         J = self.alpha * J_content + self.beta * J_style
 
         return (J, J_content, J_style)
-        
+
     def compute_grads(self, generated_image):
         """Calculates the gradients for the generated image"""
         if not isinstance(generated_image, (tf.Tensor, tf.Variable)):
