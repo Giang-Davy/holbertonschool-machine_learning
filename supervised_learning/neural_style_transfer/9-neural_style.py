@@ -6,6 +6,10 @@ Neural style transfer
 import numpy as np
 import tensorflow as tf
 
+random.seed(0)
+np.random.seed(0)
+tf.random.set_seed(0)
+
 
 class NST:
     """
