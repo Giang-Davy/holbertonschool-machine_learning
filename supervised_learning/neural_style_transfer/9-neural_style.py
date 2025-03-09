@@ -9,7 +9,7 @@ import tensorflow as tf
 
 class NST:
     """
-    Class that performs tasks for neural style transfer
+    CECI EST UN TEST
     """
 
     style_layers = ['block1_conv1', 'block2_conv1', 'block3_conv1',
@@ -377,3 +377,6 @@ class NST:
         best_image = best_image.numpy()
 
         return best_image, best_cost
+
+
+
