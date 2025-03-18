@@ -18,6 +18,9 @@ def determinant(matrix):
     # Vérifie si la matrice est carrée
     if len(matrix) != len(matrix[0]):
         raise ValueError("matrix must be a square matrix")
+    for sub_list in matrix:
+        if len(matrix) != len(matrix[0]):
+            raise TypeError("matrix must be a list of lists")
 
     row = len(matrix)
     col = len(matrix[0])
