@@ -7,6 +7,9 @@ def determinant(matrix):
     # Vérifie si la matrice est une liste de listes
     if not isinstance(matrix, list) or len(matrix) == 0:
         raise TypeError("matrix must be a list of lists")
+    for sub_list in matrix:
+        if not isinstance(sub_list, list):
+            raise TypeError("matrix must be a list of lists")
 
     # Vérifie si la matrice est vide
     if not matrix or not matrix[0]:
