@@ -1,44 +1,36 @@
 #!/usr/bin/env python3
-"""
-Defines function that calculates the determinant of a matrix
-"""
+"""fonction"""
 
 
 def determinant(matrix):
-    """
-    Calculates the determinant of a matrix
-
-    parameters:
-        matrix [list of lists]:
-            matrix whose determinant should be calculated
-
-    returns:
-        the determinant of matrix
-    """
-    if not isinstance(matrix, list):
+    """determinant d'une matrice"""
+    # Vérifie si la matrice est une liste de listes
+    if not isinstance(matrix, list) or len(matrix) == 0:
         raise TypeError("matrix must be a list of lists")
-    matrix_size = len(matrix)
-    if matrix_size == 0:
-        raise TypeError("matrix must be a list of lists")
-    for row in matrix:
-        if not isinstance(row, list):
+    for sub_list in matrix:
+        if not isinstance(sub_list, list):
             raise TypeError("matrix must be a list of lists")
-        if len(row) == 0 and matrix_size == 1:
-            return 1
-        if len(row) != matrix_size:
-            raise ValueError("matrix must be a square matrix")
-    if matrix_size == 1:
-        return matrix[0][0]
-    if matrix_size == 2:
-        a = matrix[0][0]
-        b = matrix[0][1]
-        c = matrix[1][0]
-        d = matrix[1][1]
-        return (a * d) - (b * c)
 
-    # Recursive calculation for larger matrices
+    # Special case: empty matrix (0x0)
+    if len(matrix[0]) == 0:
+        return 1
+
+    # test if matrix is square
+    if len(matrix) != len(matrix[0]):
+        raise ValueError("matrix must be a square matrix")
+
+    row = len(matrix)
+    col = len(matrix[0])
+
+    if (row, col) == (1, 1):
+        return matrix[0][0]
+
+    if (row, col) == (2, 2):
+        return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+
     determinant_value = 0
     sign = 1
+    matrix_size = len(matrix)
     for col in range(matrix_size):
         pivot_element = matrix[0][col]
         minor_matrix = []
@@ -48,11 +40,3 @@ def determinant(matrix):
         determinant_value += pivot_element * sign * determinant(minor_matrix)
         sign *= -1
     return determinant_value
-
-
-
-
-
-
-
-
