@@ -31,6 +31,7 @@ def minor(matrix):
 
 
 def cofactor(matrix):
+    """cofacteur pour inverser les signes"""
     if not isinstance(matrix, list):
         raise TypeError("matrix must be a list of lists")
     matrix_size = len(matrix)
