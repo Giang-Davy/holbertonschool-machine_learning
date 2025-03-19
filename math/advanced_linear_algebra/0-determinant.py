@@ -5,19 +5,22 @@
 def determinant(matrix):
     """determinant d'une matrice"""
     # Vérifie si la matrice est une liste de listes
-    if not isinstance(matrix, list) or len(matrix) == 0:
+    if not isinstance(matrix, list):
         raise TypeError("matrix must be a list of lists")
-    for sub_list in matrix:
-        if not isinstance(sub_list, list):
+    matrix_size = len(matrix)
+    if matrix_size == 0:
+        raise TypeError("matrix must be a list of lists")
+    for row in matrix:
+        if not isinstance(row, list):
             raise TypeError("matrix must be a list of lists")
+        if len(row) == 0 and matrix_size == 1:
+            return 1
+        if len(row) != matrix_size:
+            raise ValueError("matrix must be a square matrix")
 
     # Special case: empty matrix (0x0)
     if len(matrix[0]) == 0:
         return 1
-
-    # test if matrix is square
-    if len(matrix) != len(matrix[0]):
-        raise ValueError("matrix must be a square matrix")
 
     if len(matrix) == 1:
         return matrix[0][0]
