@@ -2,6 +2,9 @@
 """fonction"""
 
 
+import numpy as np
+
+
 def determinant(matrix):
     """Calcul du déterminant d'une matrice carrée"""
     if len(matrix) == 1:
@@ -97,9 +100,6 @@ def inverse(matrix):
 
 def definiteness(matrix):
     """définir une matrice"""
-
-    import numpy as np
-
     if not isinstance(matrix, np.ndarray):
         raise TypeError("matrix must be a numpy.ndarray")
     if matrix.size == 0:
