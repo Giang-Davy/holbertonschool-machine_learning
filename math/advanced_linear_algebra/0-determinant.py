@@ -2,19 +2,6 @@
 """fonction"""
 
 
-def sub_matrix(matrix, i):
-    """
-    Creates a submatrix by removing the first row and the i-th column
-    """
-    if not matrix:
-        return []
-
-    matrix2 = []
-    for row in matrix[1:]:  # Skip the first row
-        matrix2.append(row[:i] + row[i + 1:])  # Remove the i-th column
-
-    return matrix2
-
 def determinant(matrix):
     """determinant d'une matrice"""
     # Vérifie si la matrice est une liste de listes
@@ -41,11 +28,15 @@ def determinant(matrix):
     if (row, col) == (2, 2):
         return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
 
-    det = 0
-    for i in range(len(matrix[0])):
-        det += (
-                ((-1) ** i) * matrix[0][i] * determinant(
-                    sub_matrix(matrix, i)
-                    )
-                )
-    return det
+    determinant_value = 0
+    sign = 1
+    matrix_size = len(matrix)
+    for col in range(matrix_size):
+        pivot_element = matrix[0][col]
+        minor_matrix = []
+        for row in range(1, matrix_size):
+            new_row = [matrix[row][c] for c in range(matrix_size) if c != col]
+            minor_matrix.append(new_row)
+        determinant_value += pivot_element * sign * determinant(minor_matrix)
+        sign *= -1
+    return determinant_value
