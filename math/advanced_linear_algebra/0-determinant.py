@@ -11,16 +11,13 @@ def determinant(matrix):
         if not isinstance(sub_list, list):
             raise TypeError("matrix must be a list of lists")
 
-    # Vérifie si la matrice est vide
-    if not matrix or not matrix[0]:
+    # Special case: empty matrix (0x0)
+    if len(matrix[0]) == 0:
         return 1
 
-    # Vérifie si la matrice est carrée
+    # test if matrix is square
     if len(matrix) != len(matrix[0]):
         raise ValueError("matrix must be a square matrix")
-    for sub_list in matrix:
-        if len(matrix) != len(matrix[0]):
-            raise TypeError("matrix must be a list of lists")
 
     row = len(matrix)
     col = len(matrix[0])
