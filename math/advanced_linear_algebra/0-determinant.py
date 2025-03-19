@@ -19,13 +19,10 @@ def determinant(matrix):
     if len(matrix) != len(matrix[0]):
         raise ValueError("matrix must be a square matrix")
 
-    row = len(matrix)
-    col = len(matrix[0])
-
-    if (row, col) == (1, 1):
+    if len(matrix) == 1:
         return matrix[0][0]
 
-    if (row, col) == (2, 2):
+    if len(matrix) == 2:
         return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
 
     determinant_value = 0
