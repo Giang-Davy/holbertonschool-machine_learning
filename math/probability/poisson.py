@@ -18,3 +18,16 @@ class Poisson:
             if not len(data) >= 2:
                 raise ValueError("data must contain multiple values")
             self.lambtha = float(sum(data) / len(data))
+
+    def pmf(self, k):
+        """Probability Mass Function"""
+        if not isinstance(k, int):
+            k = int(k)
+        if k <= 0:
+            return 0
+        factorielle = 1
+        for i in range(1, k + 1):
+            factorielle *= i
+        e = 2.7182818285
+        pmf_result = (e**-self.lambtha*self.lambtha**k)/factorielle
+        return pmf_result
