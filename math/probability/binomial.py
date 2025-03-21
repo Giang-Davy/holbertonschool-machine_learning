@@ -28,6 +28,8 @@ class Binomial:
 
     def pmf(self, k):
         """Calcule la probabilité de masse binomiale"""
+        if not isinstance(k, int):
+            k = int(k)
         if k < 0 or k > self.n:
             return 0
         # Calculer la factorielle de n, k et (n - k)
