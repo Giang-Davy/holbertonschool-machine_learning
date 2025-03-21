@@ -25,3 +25,22 @@ class Binomial:
             p = mean / n
             self.n = int(n)
             self.p = float(p)
+
+    def pmf(self, k):
+        """Calcule la probabilité de masse binomiale"""
+        if k < 0 or k > self.n:
+            return 0
+        # Calculer la factorielle de n, k et (n - k)
+        fact_n = 1
+        fact_k = 1
+        fact_n_k = 1
+
+        for i in range(1, self.n + 1):
+            fact_n *= i
+        for i in range(1, k + 1):
+            fact_k *= i
+        for i in range(1, (self.n - k) + 1):
+            fact_n_k *= i
+
+        binom_coeff = fact_n // (fact_k * fact_n_k)
+        return binom_coeff * (self.p ** k) * ((1 - self.p) ** (self.n - k))
