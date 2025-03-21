@@ -1,7 +1,6 @@
 # **Binomial Distribution Calculator**
 
 ![Screenshot](proba.png)  
-*(Add a screenshot showing the application or a calculation being performed by your project.)*
 
 ---
 
