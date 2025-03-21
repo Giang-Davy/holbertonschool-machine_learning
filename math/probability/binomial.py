@@ -46,3 +46,15 @@ class Binomial:
 
         binom_coeff = fact_n // (fact_k * fact_n_k)
         return binom_coeff * (self.p ** k) * ((1 - self.p) ** (self.n - k))
+
+    def cdf(self, k):
+        """cdf en loi binomial"""
+        if not isinstance(k, int):
+            k = int(k)
+        if k < 0 or k > self.n:
+            return 0
+        cdf = 0
+        for i in range(k + 1):
+            coef = 1
+            cdf += self.pmf(i)
+        return cdf
