@@ -1,7 +1,17 @@
 # **Advanced Linear Algebra Calculator**
 
-![Screenshot](image/algebra.jpg)  
+![Screenshot](image/algebra.jpg)
+---
 
+## **Table of Contents**
+1. [About Me](#about-me)
+2. [Project Description](#project-description)
+3. [Development Journey](#development-journey)
+4. [Challenges & Lessons Learned](#challenges--lessons-learned)
+5. [Features Implemented](#features-implemented)
+6. [How to Run the Project](#how-to-run-the-project)
+7. [Contributing](#contributing)
+8. [Contact](#contact)
 ---
 
 ## **About Me**  
