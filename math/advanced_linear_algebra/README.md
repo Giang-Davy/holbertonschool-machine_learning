@@ -62,3 +62,10 @@ During this process, I learned a lot about **numerical methods** and the importa
 - **Eigenvalue** and **eigenvector** computation
 
 ---
+## **How to Run the Project**
+1. Clone this repository:  
+   ```bash
+   git clone ../advanced_linear_algebra
+   
+2. Change your directory to the project folder:
+   cd advanced_linear_algebra
