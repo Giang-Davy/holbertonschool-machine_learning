@@ -5,7 +5,7 @@
 ---
 
 ## **About Me**  
-I'm **[Your Name](https://www.linkedin.com/in/yourprofile)**, a developer with a passion for mathematics and computer science. I enjoy solving complex problems through algorithmic approaches. You can follow me on **[Twitter](https://twitter.com/youralias)**, and check out my projects and work on my **[Portfolio GitHub](https://github.com/yourportfolio)**.
+I'm **[Davy](https://github.com/Giang-Davy)**, a developer with a passion for mathematics and computer science. I enjoy solving complex problems through algorithmic approaches. You can follow me on **[Linkedlin](https://www.linkedin.com/in/davy-dang-vu-956059322/)**.
 
 ---
 
