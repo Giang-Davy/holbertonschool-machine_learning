@@ -74,10 +74,23 @@ During this process, I learned a lot about **numerical methods** and the importa
    If there is a requirements.txt file (for Python dependencies), run:
    ```bash
    pip install -r requirements.txt
-If you're using a virtual environment, activate it first:
+   
+4. If you're using a virtual environment, activate it first:
    ```bash
-# On Linux/macOS
-source venv/bin/activate
+   # On Linux/macOS
+   source venv/bin/activate
 
-# On Windows
-venv\Scripts\activate
+   # On Windows
+   venv\Scripts\activate
+---
+
+## **Contributing**
+Contributions are welcome! If you'd like to contribute to this project, feel free to fork the repository and submit a pull request. Please make sure to follow the code style used in the project and write clear commit messages.
+
+---
+
+## **Contact**
+You can reach me via:
+- Email: davy.dangvu@gmail.com
+- GitHub: [Giang-Davy](https://github.com/Giang-Davy)
+- LinkedIn: [Davy](https://www.linkedin.com/in/davy-dang-vu-956059322/)
