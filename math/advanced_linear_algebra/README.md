@@ -76,8 +76,8 @@ During this process, I learned a lot about **numerical methods** and the importa
    pip install -r requirements.txt
 If you're using a virtual environment, activate it first:
    ```bash
-      # On Linux/macOS
-      source venv/bin/activate
+# On Linux/macOS
+source venv/bin/activate
 
-      # On Windows
-      venv\Scripts\activate
+# On Windows
+venv\Scripts\activate
