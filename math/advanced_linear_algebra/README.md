@@ -1,6 +1,6 @@
 # **Advanced Linear Algebra Calculator**
 
-![Screenshot](image/algebra.jpeg)  
+![Screenshot](image/algebra.jpg)  
 
 ---
 
