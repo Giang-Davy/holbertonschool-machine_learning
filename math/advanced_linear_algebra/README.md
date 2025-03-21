@@ -68,4 +68,16 @@ During this process, I learned a lot about **numerical methods** and the importa
    git clone ../advanced_linear_algebra
    
 2. Change your directory to the project folder:
+   ```bash
    cd advanced_linear_algebra
+3. Install dependencies:
+   If there is a requirements.txt file (for Python dependencies), run:
+   ```bash
+   pip install -r requirements.txt
+If you're using a virtual environment, activate it first:
+   ```bash
+   # On Linux/macOS
+   source venv/bin/activate
+
+   # On Windows
+   venv\Scripts\activate
