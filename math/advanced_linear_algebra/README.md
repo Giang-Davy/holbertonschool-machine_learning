@@ -1,2 +1,2 @@
 Advanced Linear Algebra
-![Texte alternatif](images/blanc.avif)
+![Texte alternatif](image/blanc.avif)
