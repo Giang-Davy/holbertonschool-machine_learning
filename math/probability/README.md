@@ -86,6 +86,6 @@ Contributions are welcome! If you'd like to contribute to this project, feel fre
 
 ## **Contact**
 You can reach me via:
-- Email: your.email@example.com
+- Email: davy.dangvu@gmail.com
 - GitHub: [Giang-Davy](https://github.com/Giang-Davy)
 - LinkedIn: [Davy](https://www.linkedin.com/in/davy-dang-vu-956059322/)
