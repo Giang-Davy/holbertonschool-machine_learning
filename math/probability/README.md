@@ -1,6 +1,6 @@
 # **Binomial Distribution Calculator**
 
-![Screenshot](path/to/screenshot.png)  
+![Screenshot](../advanced_linear_algebra/screenshot.png)  
 *(Add a screenshot showing the application or a calculation being performed by your project.)*
 
 ---
