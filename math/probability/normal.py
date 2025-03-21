@@ -28,3 +28,12 @@ class Normal:
         """valeur de z"""
         x_score = z*self.stddev+self.mean
         return x_score
+
+    def pdf(self, x):
+        """pdf pour la loi normal"""
+        pi = 3.1415926536
+        e = 2.7182818285
+        pdf_value = (
+            1 / (self.stddev * (2 * pi)**0.5)) * e**(
+                -((x - self.mean)**2) / (2 * self.stddev**2))
+        return pdf_value
