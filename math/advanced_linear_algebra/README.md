@@ -1,7 +1,6 @@
 # **Advanced Linear Algebra Calculator**
 
-![Screenshot](path/to/screenshot.png)  
-*(Add a screenshot showing the application or a calculation being performed by your project.)*
+![Screenshot](image/algebra.jpeg)  
 
 ---
 
