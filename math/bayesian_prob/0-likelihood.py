@@ -10,7 +10,8 @@ def likelihood(x, n, P):
     if not isinstance(n, int) or n <= 0:
         raise ValueError("n must be a positive integer")
     if not isinstance(x, int) or x < 0:
-        raise ValueError("x must be an integer that is greater than or equal to 0")
+        raise ValueError(
+            "x must be an integer that is greater than or equal to 0")
     if x > n:
         raise ValueError("x cannot be greater than n")
     if not isinstance(P, np.ndarray) or P.ndim != 1:
@@ -19,7 +20,8 @@ def likelihood(x, n, P):
         raise ValueError("All values in P must be in the range [0, 1]")
 
     # Calcul de la vraisemblance pour chaque probabilité dans P
-    binom_coeff = np.prod(np.arange(n - x + 1, n + 1)) / np.prod(np.arange(1, x + 1))
+    binom_coeff = np.math.factorial(n) / (
+        np.math.factorial(x) * np.math.factorial(n - x))
     likelihood_values = binom_coeff * P**x * (1 - P)**(n - x)
 
     return likelihood_values
