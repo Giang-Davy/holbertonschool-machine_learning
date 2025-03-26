@@ -16,6 +16,7 @@ def mean_cov(X):
     
     # Calculate the mean
     mean = np.mean(X, axis=0)
+    mean = np.array([mean])
     
     # Calculate the covariance
     X_centered = X - mean
