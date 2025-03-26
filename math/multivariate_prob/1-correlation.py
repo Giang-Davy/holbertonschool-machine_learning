@@ -11,5 +11,8 @@ def correlation(C):
         raise TypeError("C must be a numpy.ndarray")
     if len(C.shape) != 2 or C.shape[0] != C.shape[1]:
         raise ValueError("C must be a 2D square matrix")
-    corr = np.corrcoef(C)
-    return corr
+    
+    ecart = np.sqrt(np.diag(C))
+    outer = np.outer(ecart, ecart)
+    correlation_matrix = C / outer
+    return correlation_matrix
