@@ -31,13 +31,12 @@ class MultiNormal:
         if x.shape != (d, 1):
             raise ValueError(f"x must have the shape ({d}, 1)")
         det_cov = np.linalg.det(self.cov)
-        sqrt_det_cov = np.sqrt(det_cov)
         inv_cov = np.linalg.inv(self.cov)
         X_centered = x - self.mean
 
         # Correct PDF formula
-        exponent = -0.5 * np.dot(X_centered.T, np.dot(inv_cov, X_centered))
+        exponent = -0.5 * np.dot(np.dot(X_centered.T, inv_cov), X_centered)
         pdf_value = (
-            1 / ((2 * np.pi) ** (d / 2) * sqrt_det_cov)) * np.exp(exponent)
+            1 / np.sqrt((2 * np.pi) ** d * det_cov)) * np.exp(exponent)
 
         return float(pdf_value)  # Return as a scalar
