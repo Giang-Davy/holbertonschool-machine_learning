@@ -9,7 +9,7 @@ class MultiNormal:
     """classe multinormal"""
     def __init__(self, data):
         """initialisation"""
-        if not isinstance(data, np.ndarray):
+        if not isinstance(data, np.ndarray) or data.shape[0] != data.shape[1]:
             raise TypeError("data must be a 2D numpy.ndarray")
         d, n = data.shape
         if n < 2:
