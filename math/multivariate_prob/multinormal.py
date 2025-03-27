@@ -22,3 +22,28 @@ class MultiNormal:
 
         self.mean = mean
         self.cov = cov
+
+    def pdf(self, x):
+        """calculer le pdf"""
+        if not isinstance(x, np.ndarray):
+            raise TypeError("x must be a numpy.ndarray")
+        if x.ndim != 2 or x.shape[1] != 1:
+            raise ValueError("x must have the shape (d, 1)")
+        if x.shape[0] != self.mean.shape[0]:
+            raise ValueError("x must have the same number of rows as the mean")
+
+        d = self.mean.shape[0]
+        det_cov = np.linalg.det(self.cov)
+        if det_cov <= 0:
+            raise ValueError("The covariance matrix must be positive definite")
+
+        sqrt_det_cov = np.sqrt(det_cov)
+        inv_cov = np.linalg.inv(self.cov)
+        X_centered = x - self.mean
+
+        # Correct PDF formula
+        exponent = -0.5 * np.dot(X_centered.T, np.dot(inv_cov, X_centered))
+        pdf_value = (
+            1 / ((2 * np.pi) ** (d / 2) * sqrt_det_cov)) * np.exp(exponent)
+
+        return pdf_value[0, 0]  # Return as a scalar
