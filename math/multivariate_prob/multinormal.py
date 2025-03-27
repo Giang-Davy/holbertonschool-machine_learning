@@ -28,9 +28,9 @@ class MultiNormal:
         if not isinstance(x, np.ndarray):
             raise TypeError("x must be a numpy.ndarray")
         if x.ndim != 2 or x.shape[1] != 1:
-            raise ValueError("x must have the shape (d, 1)")
+            raise ValueError("x must have the shape ({d}, 1)")
         if x.shape[0] != self.mean.shape[0]:
-            raise ValueError("x must have the same number of rows as the mean")
+            raise ValueError("x must have the shape ({d}, 1)")
 
         d = self.mean.shape[0]
         det_cov = np.linalg.det(self.cov)
