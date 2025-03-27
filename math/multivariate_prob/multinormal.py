@@ -24,21 +24,29 @@ class MultiNormal:
         self.cov = cov
 
     def pdf(self, x):
-        """calculer le pdf"""
+        """
+        Calculate the probability density function (PDF) value for a given
+        data point.
+        """
         if not isinstance(x, np.ndarray):
             raise TypeError("x must be a numpy.ndarray")
 
         d = self.mean.shape[0]
-        det_cov = np.linalg.det(self.cov)
+
         if x.shape != (d, 1):
             raise ValueError(f"x must have the shape ({d}, 1)")
-        sqrt_det_cov = np.sqrt(det_cov)
+
+        x_centered = x - self.mean
         inv_cov = np.linalg.inv(self.cov)
-        X_centered = x - self.mean
+        det_cov = np.linalg.det(self.cov)
 
-        # Correct PDF formula
-        exponent = -0.5 * np.dot(X_centered.T, np.dot(inv_cov, X_centered))
-        pdf_value = (
-           1 / np.sqrt((2 * np.pi) ** d * det_cov)) * np.exp(exponent)
+        norm_factor = 1 / np.sqrt((2 * np.pi) ** d * det_cov)
+        exp_factor = np.exp(
+                -0.5 * np.dot(np.dot(x_centered.T, inv_cov), x_centered))
 
-        return pdf_value[0, 0]  # Return as a scalar
+        return float(norm_factor * exp_factor)
+    
+
+
+
+    
