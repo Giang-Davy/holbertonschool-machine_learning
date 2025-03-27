@@ -39,6 +39,6 @@ class MultiNormal:
         # Correct PDF formula
         exponent = -0.5 * np.dot(X_centered.T, np.dot(inv_cov, X_centered))
         pdf_value = (
-            1 / ((2 * np.pi) ** (d / 2) * sqrt_det_cov)) * np.exp(exponent)
+           1 / np.sqrt((2 * np.pi) ** d * det_cov)) * np.exp(exponent)
 
         return pdf_value[0, 0]  # Return as a scalar
