@@ -30,11 +30,8 @@ class MultiNormal:
 
         d = self.mean.shape[0]
         det_cov = np.linalg.det(self.cov)
-        if x.ndim != 2 or x.shape[1] != 1:
-            raise ValueError("x must have the shape ({d}, 1)")
-        if x.shape[0] != self.mean.shape[0]:
-            raise ValueError("x must have the shape ({d}, 1)")
-
+        if x.shape != (d, 1):
+            raise ValueError(f"x must have the shape ({d}, 1)")
         sqrt_det_cov = np.sqrt(det_cov)
         inv_cov = np.linalg.inv(self.cov)
         X_centered = x - self.mean
