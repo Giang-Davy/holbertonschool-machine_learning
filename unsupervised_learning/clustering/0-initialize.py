@@ -9,7 +9,7 @@ def initialize(X, k):
     """initialisation"""
     if not isinstance(X, np.ndarray ) or X.ndim != 2:
         return None
-    if not isinstance(k, int) or k < 0:
+    if not isinstance(k, int) or k <= 0 or k > X.shape[0]:
         return None
     mini = np.min(X, axis=0)
     maxi = np.max(X, axis=0)
