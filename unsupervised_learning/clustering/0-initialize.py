@@ -8,6 +8,7 @@ import numpy as np
 def initialize(X, k):
     """initialisation"""
     mini = np.min(X, axis=0)
-    max = np.max(X, axis=0)
-    uni = np.ramdom.uniform(mini, max)
+    maxi = np.max(X, axis=0)
+    size = (k, X.shape[1])
+    uni = np.random.uniform(mini, maxi, size)
     return uni
