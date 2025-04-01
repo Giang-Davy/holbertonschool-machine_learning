@@ -19,7 +19,7 @@ def initialize(X, k):
 
 
 def kmeans(X, k, iterations=1000):
-    """Performs K-means on a dataset"""
+    """Algorithme des K-means"""
     if not isinstance(X, np.ndarray) or X.ndim != 2:
         return None, None
     if not isinstance(k, int) or k <= 0 or k > X.shape[0]:
@@ -27,22 +27,29 @@ def kmeans(X, k, iterations=1000):
     if not isinstance(iterations, int) or iterations <= 0:
         return None, None
 
-    # Initialize centroids
+    n, d = X.shape
     C = initialize(X, k)
     if C is None:
         return None, None
 
-    for _ in range(2):  # Limiter à deux boucles
-        # Assign clusters
-        distances = np.linalg.norm(X[:, np.newaxis] - C, axis=2)
-        clss = np.argmin(distances, axis=1)
+    for _ in range(iterations):
+        C_old = C.copy()
+        # 1. Calculer les distances entre les points et les centroids
+        distances = np.sqrt(np.sum((X - C[:, np.newaxis]) ** 2, axis=2))
 
-        # Update centroids
-        new_C = np.array([X[clss == i].mean(axis=0) if np.any(clss == i) else np.random.uniform(np.min(X, axis=0), np.max(X, axis=0), X.shape[1]) for i in range(k)])
+        # 2. Assigner chaque point au cluster le plus proche
+        clss = np.argmin(distances, axis=0)
 
-        # Check for convergence
-        if np.all(C == new_C):
+        # 4. Mettre à jour les centroids
+        for i in range(k):
+            if np.any(clss == i):
+                C[i] = np.mean(X[clss == i], axis=0)
+            else:
+                C[i] = np.random.uniform(
+                    np.min(X, axis=0), np.max(X, axis=0), size=(1, d))
+
+        # 5. Vérifier la convergence
+        if np.all(C == C_old):
             break
-        C = new_C
 
     return C, clss
