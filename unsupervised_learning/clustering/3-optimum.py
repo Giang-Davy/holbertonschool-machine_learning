@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """3-optimum.py"""
 
+
 import numpy as np
 kmeans = __import__('1-kmeans').kmeans
 variance = __import__('2-variance').variance
+
 
 def optimum_k(X, kmin=1, kmax=None, iterations=1000):
     """Tests for the optimum number of clusters by variance"""
@@ -18,7 +20,7 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
         return None, None
     if not isinstance(iterations, int) or iterations <= 0:
         return None, None
-    if kmax - kmin + 1 < 2:  # Vérifie qu'au moins 2 tailles de clusters sont testées
+    if kmax - kmin + 1 < 2:
         return None, None
 
     results = []
