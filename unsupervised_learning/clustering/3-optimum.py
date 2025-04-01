@@ -30,7 +30,9 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
         var = variance(X, C)
         if var_min is None:  # Première valeur comme référence
             var_min = var
-        
-        d_vars.append(abs(var - var_min))  # Différence de variance
+            d_vars.append(0)  # La première différence est 0
+        else:
+            delta_var = var_min - var  # Calculer la différence
+            d_vars.append(delta_var if delta_var > 0 else 0)  # Ajouter uniquement des valeurs positives
 
     return results, d_vars
