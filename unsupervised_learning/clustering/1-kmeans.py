@@ -40,13 +40,17 @@ def kmeans(X, k, iterations=1000):
         # 2. Assigner chaque point au cluster le plus proche
         clss = np.argmin(distances, axis=0)
 
-        # 4. Mettre à jour les centroids
         for i in range(k):
-            if np.any(clss == i):
-                C[i] = np.mean(X[clss == i], axis=0)
+            # Mask: points present in cluster
+            cluster_mask = X[clss == i]
+            if len(cluster_mask) == 0:
+                C[i] = initialize(X, 1)
             else:
-                C[i] = np.random.uniform(
-                    np.min(X, axis=0), np.max(X, axis=0), size=(1, d))
+                C[i] = np.mean(X[clss == i], axis=0)
+
+        # Recalculate distances and reassign clusters
+        dists = np.sqrt(np.sum((X - C[:, np.newaxis]) ** 2, axis=2))
+        clss = np.argmin(dists, axis=0)
 
         # 5. Vérifier la convergence
         if np.all(C == C_old):
