@@ -1,38 +1,39 @@
 #!/usr/bin/env python3
 """3-optimum.py"""
 
-
 import numpy as np
 kmeans = __import__('1-kmeans').kmeans
 variance = __import__('2-variance').variance
 
-
 def optimum_k(X, kmin=1, kmax=None, iterations=1000):
-    """Optimize"""
+    """Tests for the optimum number of clusters by variance"""
     if not isinstance(X, np.ndarray) or X.ndim != 2:
         return None, None
     n, d = X.shape
-    if not isinstance(kmin, int) or not isinstance(kmax, int) or kmin <= 0 or kmax < kmin or kmax > n:
+    if not isinstance(kmin, int) or kmin <= 0 or kmin >= n:
+        return None, None
+    if kmax is None:
+        kmax = n
+    if not isinstance(kmax, int) or kmax <= 0 or kmax < kmin or kmax > n:
         return None, None
     if not isinstance(iterations, int) or iterations <= 0:
         return None, None
+    if kmax - kmin + 1 < 2:  # Vérifie qu'au moins 2 tailles de clusters sont testées
+        return None, None
 
     results = []
-    d_vars = []
-    var_min = None
+    variances = []
 
+    # Boucle unique pour calculer les résultats et les variances
     for k in range(kmin, kmax + 1):
         C, clss = kmeans(X, k, iterations)
         if C is None:
             return None, None
         results.append((C, clss))
+        variances.append(variance(X, C))
 
-        var = variance(X, C)
-        if var_min is None:  # Première valeur comme référence
-            var_min = var
-            d_vars.append(0)  # La première différence est 0
-        else:
-            delta_var = var_min - var  # Calculer la différence
-            d_vars.append(delta_var if delta_var > 0 else 0)  # Ajouter uniquement des valeurs positives
+    # Calcul des différences de variance
+    var_min = variances[0]
+    d_vars = [var_min - var for var in variances]
 
     return results, d_vars
