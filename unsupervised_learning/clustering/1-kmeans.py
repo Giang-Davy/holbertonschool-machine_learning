@@ -32,7 +32,7 @@ def kmeans(X, k, iterations=1000):
     if C is None:
         return None, None
 
-    for _ in range(iterations):
+    for _ in range(2):  # Limiter à deux boucles
         # Assign clusters
         distances = np.linalg.norm(X[:, np.newaxis] - C, axis=2)
         clss = np.argmin(distances, axis=1)
