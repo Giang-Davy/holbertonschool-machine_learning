@@ -17,6 +17,10 @@ def expectation(X, pi, m, S):
             pi.shape[0] != m.shape[0] or pi.shape[0] != S.shape[0]):
         return None, None
 
+    # Vérification de la validité de pi
+    if not np.isclose(np.sum(pi), 1) or np.any(pi < 0) or np.any(pi > 1):
+        return None, None
+
     k, n = pi.shape[0], X.shape[0]
     g = np.zeros((k, n))
 
