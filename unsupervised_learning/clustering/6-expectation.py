@@ -24,13 +24,13 @@ def expectation(X, pi, m, S):
     k, n = pi.shape[0], X.shape[0]
     g = np.zeros((k, n))
 
-    for i in range(k):  
+    for i in range(k):
         g[i] = pi[i] * pdf(X, m[i], S[i])
 
     total_prob = np.sum(g, axis=0)
     g /= total_prob
 
     total_prob = np.maximum(total_prob, 1e-300)
-    l = np.sum(np.log(total_prob))
+    like = np.sum(np.log(total_prob))
 
-    return g, l
+    return g, like
