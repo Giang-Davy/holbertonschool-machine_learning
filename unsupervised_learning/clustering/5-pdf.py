@@ -20,10 +20,12 @@ def pdf(X, m, S):
         return None
 
     det_cov = np.linalg.det(S)
+    if det_cov <= 0:  # Check for invalid determinant
+        return np.full(X.shape[0], 1e-300)
+
     inv_cov = np.linalg.inv(S)
     X_centered = X - m
     coef = 1 / np.sqrt((2 * np.pi) ** X.shape[1] * det_cov)
-    # Correct PDF formula
     exponent = -0.5 * np.sum(X_centered @ inv_cov * X_centered, axis=1)
 
     P = coef * np.exp(exponent)
