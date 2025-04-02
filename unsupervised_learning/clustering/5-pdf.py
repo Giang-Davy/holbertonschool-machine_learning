@@ -13,11 +13,10 @@ def pdf(X, m, S):
         return None
     if not isinstance(m, np.ndarray) or m.ndim != 1:
         return None
-    if m.shape[0] != X.shape[1]:
+    if not isinstance(S, np.ndarray) or S.ndim != 2:
         return None
-    if not isinstance(S, np.ndarray) or S.shape[0] != X.shape[1]:
-        return None
-    if S.shape[0] != S.shape[1]:
+    if (X.shape[1] != m.shape[0] or S.shape[0] != S.shape[1]
+            or S.shape[0] != m.shape[0]):
         return None
 
     det_cov = np.linalg.det(S)
