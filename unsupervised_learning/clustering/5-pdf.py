@@ -28,4 +28,5 @@ def pdf(X, m, S):
     exponent = -0.5 * np.sum(X_centered @ inv_cov * X_centered, axis=1)
 
     P = coef * np.exp(exponent)
+    P = np.maximum(P, 1e-300)
     return P
