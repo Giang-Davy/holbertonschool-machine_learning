@@ -10,7 +10,9 @@ def expectation(X, pi, m, S):
     """Calculates the expectation step in the EM algorithm for a GMM"""
     if not isinstance(X, np.ndarray) or X.ndim != 2:
         return None, None
-    if not isinstance(pi, np.ndarray):
+    if not isinstance(pi, np.ndarray) or pi.ndim != 1:
+        return None, None
+    if pi.shape[0] != m.shape[0] or pi.shape[0] != S.shape[0]:
         return None, None
     if not isinstance(m, np.ndarray) or m.ndim != 2:
         return None, None
