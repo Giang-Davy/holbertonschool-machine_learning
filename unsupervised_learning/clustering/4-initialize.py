@@ -14,6 +14,7 @@ def initialize(X, k):
         return None, None, None
     pi = np.full(k, 1/k)
     m, _ = kmeans(X, k)
+    # c'est nouveau ça
     S = np.tile(np.eye(X.shape[1]), (k, 1, 1))
 
-    return pi, m , S
+    return pi, m, S
