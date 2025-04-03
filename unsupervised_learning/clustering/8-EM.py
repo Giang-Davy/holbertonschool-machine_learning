@@ -21,13 +21,18 @@ def expectation_maximization(X, k, iterations=1000, tol=1e-5, verbose=False):
     if not isinstance(verbose, bool):
         return None, None, None, None, None
 
-    prev_like = None
+    prev_like = -np.inf  # Initialisation correcte
     pi, m, S = initialize(X, k)
     for i in range(iterations):
         g, like = expectation(X, pi, m, S)
         pi, m, S = maximization(X, g)
+        if verbose and i % 10 == 0:
+            print(f"Log Likelihood after {i} iterations: {round(like, 5)}")
 
-        if prev_like is not None and abs(like - prev_like) <= tol:
+        if abs(like - prev_like) <= tol:
+            if verbose:
+                # NOTE i + 1 since it has been updated once more since last print
+                print(f"Log Likelihood after {i} iterations: {round(like, 5)}")
             break
         prev_like = like
     return pi, m, S, g, like
