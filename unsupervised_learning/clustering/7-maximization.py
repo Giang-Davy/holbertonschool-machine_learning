@@ -14,16 +14,17 @@ def maximization(X, g):
     if g.shape[1] !=  X.shape[0]:
         return None, None, None
 
-    k, n = g.shape
+    n, d = X.shape
+    k, _ = g.shape
 
     # Calcul des priorités pi
-    pi = np.sum(g, axis=1) / np.sum(g)
+    pi = np.sum(g, axis=1) / n
 
     # Calcul des centres m
-    m, _ = np.dot(g, X) / np.sum(g, axis=1, keepdims=True)
+    m = np.dot(g, X) / np.sum(g, axis=1, keepdims=True)
 
     # Calcul des matrices de covariance S avec une boucle
-    S = np.zeros((k, X.shape[1], X.shape[1]))  # Initialisation de S
+    S = np.zeros((k, d, d))  # Initialisation de S
 
     for i in range(k):
         X_centered = X - m[i]  # Centrer X par rapport à m[i]
