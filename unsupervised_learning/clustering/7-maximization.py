@@ -20,7 +20,7 @@ def maximization(X, g):
     pi = np.sum(g, axis=1) / np.sum(g)
 
     # Calcul des centres m
-    m = np.dot(g, X) / np.sum(g, axis=1, keepdims=True)
+    m, _ = np.dot(g, X) / np.sum(g, axis=1, keepdims=True)
 
     # Calcul des matrices de covariance S avec une boucle
     S = np.zeros((k, X.shape[1], X.shape[1]))  # Initialisation de S
