@@ -13,7 +13,7 @@ def maximization(X, g):
         return None, None, None
     if g.shape[1] != X.shape[0]:
         return None, None, None
-    if np.allclose(g.sum(axis=0), 1.0):
+    if not np.allclose(g.sum(axis=0), 1.0):
         return None, None, None
 
     k, n = g.shape
