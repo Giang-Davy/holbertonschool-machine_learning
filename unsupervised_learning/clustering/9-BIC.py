@@ -49,9 +49,9 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
         b.append(BIC_value)
 
         # Vérifier si ce BIC est le meilleur
-        if k == kmin or BIC < best_bic:
+        if k == kmin or BIC_value < best_bic:
             # Update the return values
-            best_bic = BIC
+            best_bic = BIC_value
             best_results = (pi, m, S)
             best_k = k
 
