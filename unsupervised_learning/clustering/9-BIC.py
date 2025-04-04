@@ -27,35 +27,25 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
     if not isinstance(verbose, bool):
         return None, None, None, None
 
-    likehood = []  # Liste pour stocker les log-vraisemblances
-    b = []         # Liste pour stocker les valeurs BIC
-    best_bic = float('inf')  # Initialisation du meilleur BIC à l'infini
-    best_k = None
-    best_result = None
-
+    b = []
+    likelihoods = []
     for k in range(kmin, kmax + 1):
-        pi, m, S, g, like = expectation_maximization(
+        pi, m, S, g, li = expectation_maximization(
             X, k, iterations, tol, verbose)
 
-        # Ajouter la log-vraisemblance à la liste
-        likehood.append(like)
+        if pi is None or m is None or S is None or g is None:
+            return None, None, None, None
 
-        p = k * (d + (d * (d + 1)) / 2 + 1)
+        p = (k * d) + (k * d * (d + 1) // 2) + (k - 1)
+        bic = p * np.log(n) - 2 * li
+        likelihoods.append(li)
+        b.append(bic)
 
-        # Calcul du BIC
-        BIC_value = p * np.log(n) - 2 * like
-
-        # Ajouter la valeur BIC à la liste
-        b.append(BIC_value)
-
-        # Vérifier si ce BIC est le meilleur
-        if k == kmin or BIC_value < best_bic:
-            # Update the return values
-            best_bic = BIC_value
-            best_results= (pi, m, S)
+        if k == kmin or bic < best_bic:
+            best_bic = bic
+            best_results = (pi, m, S)
             best_k = k
 
-    likelihoods = np.array(likehood)
+    likelihoods = np.array(likelihoods)
     b = np.array(b)
-
     return best_k, best_results, likelihoods, b
