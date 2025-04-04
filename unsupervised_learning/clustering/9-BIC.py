@@ -52,10 +52,10 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
         if k == kmin or BIC_value < best_bic:
             # Update the return values
             best_bic = BIC_value
-            best_results = (pi, m, S)
+            best_results= (pi, m, S)
             best_k = k
 
-    likelihoods = np.array(likelihoods)
+    likelihoods = np.array(likehood)
     b = np.array(b)
 
     return best_k, best_results, likelihoods, b
