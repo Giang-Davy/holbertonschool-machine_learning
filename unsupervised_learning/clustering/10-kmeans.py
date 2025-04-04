@@ -2,13 +2,13 @@
 """10-kmeans"""
 
 
-from sklearn.cluster import KMeans
+import sklearn.cluster
 
 
 def kmeans(X, k):
     """kmeans en sklearn"""
     # Appliquer KMeans de sklearn
-    model = KMeans(n_clusters=k)
+    model = sklearn.cluster.KMeans(n_clusters=k)
     model.fit(X)
 
     # C : centroïdes
