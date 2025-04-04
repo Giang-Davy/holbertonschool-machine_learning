@@ -33,14 +33,14 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
     best_k = None
     best_result = None
 
-    for i in range(kmin, kmax + 1):
+    for k in range(kmin, kmax + 1):
         pi, m, S, g, like = expectation_maximization(
-            X, i, iterations, tol, verbose)
+            X, k, iterations, tol, verbose)
 
         # Ajouter la log-vraisemblance à la liste
         likehood.append(like)
 
-        p = i * (d + (d * (d + 1)) / 2 + 1)
+        p = k * (d + (d * (d + 1)) / 2 + 1)
 
         # Calcul du BIC
         BIC_value = p * np.log(n) - 2 * like
@@ -49,9 +49,13 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
         b.append(BIC_value)
 
         # Vérifier si ce BIC est le meilleur
-        if BIC_value < best_bic:
-            best_bic = BIC_value
-            best_k = i
-            best_result = (pi, m, S)
+        if k == kmin or BIC < best_bic:
+            # Update the return values
+            best_bic = BIC
+            best_results = (pi, m, S)
+            best_k = k
 
-    return best_k, best_result, np.array(likehood).round(5), np.array(b).round(5)
+    likelihoods = np.array(likelihoods)
+    b = np.array(b)
+
+    return best_k, best_results, likelihoods, b
