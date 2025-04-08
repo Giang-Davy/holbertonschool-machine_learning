@@ -19,7 +19,7 @@ def regular(P):
     s = np.ones((1, P.shape[0])) / P.shape[0]
     for _ in range(10000):
         s_copy = s @ P
-        if np.allclose(s_copy, s):
+        if np.allclose(s_copy, s, atol=1e-8):
             return s
         s = s_copy
 
