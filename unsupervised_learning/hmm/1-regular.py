@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """1-regular.py"""
 
+
 import numpy as np
+
 
 def regular(P):
     """Determines the steady-state probabilities of a regular Markov chain."""
