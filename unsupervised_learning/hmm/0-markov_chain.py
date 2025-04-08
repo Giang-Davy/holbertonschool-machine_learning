@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""0-markov_chain.py"""
 
 
 import numpy as np
@@ -10,4 +11,4 @@ def markov_chain(P, s, t=1):
         return None
     for i in range(t):
         s = s @ P
-    return s 
+    return s
