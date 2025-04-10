@@ -7,6 +7,23 @@ import numpy as np
 
 def viterbi(Observation, Emission, Transition, Initial):
     """viterbi"""
+    # Input validation
+    if not isinstance(Observation, np.ndarray) or Observation.ndim != 1:
+        return None, None
+    if not isinstance(Emission, np.ndarray) or Emission.ndim != 2:
+        return None, None
+    if not isinstance(Transition, np.ndarray) or Transition.ndim != 2:
+        return None, None
+    if (not isinstance(Initial, np.ndarray) or
+        Initial.ndim != 2 or
+        Initial.shape[1] != 1):
+        return None, None
+    if (Emission.shape[0] != Transition.shape[0] or
+        Transition.shape[0] != Transition.shape[1]):
+        return None, None
+    if Emission.shape[0] != Initial.shape[0]:
+        return None, None
+
     T = Observation.shape[0]
     N = Emission.shape[0]
     F = np.zeros((N, T))
@@ -18,8 +35,7 @@ def viterbi(Observation, Emission, Transition, Initial):
 
     for t in range(1, T):
         for i in range(N):
-            trans_probs = F[
-                :, t-1] * Transition[:, i] * Emission[i, Observation[t]]
+            trans_probs = F[:, t-1] * Transition[:, i] * Emission[i, Observation[t]]
             F[i, t] = np.max(trans_probs)
             backpointer[i, t] = np.argmax(trans_probs)
 
