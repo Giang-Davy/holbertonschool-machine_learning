@@ -30,4 +30,4 @@ def viterbi(Observation, Emission, Transition, Initial):
 
     P = np.max(F[:, T-1])
 
-    return path, P
+    return path.tolist(), P
