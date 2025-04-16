@@ -12,7 +12,7 @@ class BayesianOptimization:
                  l=1, sigma_f=1, xsi=0.01, minimize=True):
         """initialisation"""
         self.f = f
-        self.gp = GP(X_init, Y_init, l=1, sigma_f=1)
+        self.gp = GP(X_init, Y_init, l=l, sigma_f=sigma_f)
         ac_samples_points = np.linspace(bounds[0], bounds[1], ac_samples)
         self.X_s = ac_samples_points.reshape(-1, 1)
         self.xsi = xsi
