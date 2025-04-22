@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""0-vanilla.py"""
 
 
 import tensorflow.keras as keras
@@ -6,17 +7,7 @@ import tensorflow.keras as keras
 
 def autoencoder(input_dims, hidden_layers, latent_dims):
     """
-    Creates an autoencoder.
-
-    Args:
-        input_dims (int): Dimensions of the model input.
-        hidden_layers (list): Number of nodes for each hidden layer in the encoder.
-        latent_dims (int): Dimensions of the latent space representation.
-
-    Returns:
-        encoder (Model): The encoder model.
-        decoder (Model): The decoder model.
-        auto (Model): The full autoencoder model.
+   autoencoder
     """
     # Encoder
     input_layer = keras.Input(shape=(input_dims,))
