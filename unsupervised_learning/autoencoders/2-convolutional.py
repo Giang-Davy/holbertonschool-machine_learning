@@ -16,20 +16,17 @@ def autoencoder(input_dims, filters, latent_dims):
         x = K.layers.Conv2D(
             filters=nodes, kernel_size=(3, 3), padding='same', activation='relu')(x)
         x = K.layers.MaxPooling2D(pool_size=(2, 2), padding='same')(x)
-    encoder = K.Model(inputs=X, outputs=x)
+    encoder = K.models.Model(inputs=X, outputs=x)
 
     # Decoder
     latent_input = K.Input(shape=latent_dims)
     x = latent_input
-    for idx, nodes in enumerate(reversed(filters)):
+    for nodes in reversed(filters[1:]):
         x = K.layers.Conv2D(
             filters=nodes, kernel_size=(3, 3), padding='same', activation='relu')(x)
         x = K.layers.UpSampling2D(size=(2, 2))(x)
     x = K.layers.Conv2D(
-        filters=input_dims[2], kernel_size=(3, 3), activation='sigmoid', padding='same')(x)
-
-    # Crop the output to match the input dimensions
-    x = K.layers.Cropping2D(cropping=((2, 2), (2, 2)))(x)
+        filters[0], kernel_size=(3, 3), activation='relu', padding='valid')(x)
 
     decoder = K.Model(inputs=latent_input, outputs=x)
 
