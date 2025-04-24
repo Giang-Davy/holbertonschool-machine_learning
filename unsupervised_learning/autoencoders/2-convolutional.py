@@ -5,49 +5,43 @@ import tensorflow.keras as K
 
 
 def autoencoder(input_dims, filters, latent_dims):
-    """
-    Builds a convolutional autoencoder.
-    """
-    # Partie Encodeur
-    entree_encodeur = K.Input(shape=input_dims)
-    x = entree_encodeur
+    """autoencoder"""
+    input_encoder = K.Input(shape=input_dims)
+    x = input_encoder
 
-    # Construction des couches convolutives
-    for n_filtres in filters:
+    for num_filters in filters:
         x = K.layers.Conv2D(
-            filters=n_filtres, kernel_size=(3, 3), padding='same', activation='relu')(x)
+            filters=num_filters,
+            kernel_size=(3, 3), padding='same', activation='relu')(x)
         x = K.layers.MaxPooling2D(pool_size=(2, 2), padding='same')(x)
 
-    encodeur = K.models.Model(inputs=entree_encodeur, outputs=x)
+    encoder = K.models.Model(inputs=input_encoder, outputs=x)
 
-    # Partie Décodeur
-    entree_decodeur = K.Input(shape=latent_dims)
-    x = entree_decodeur
+    input_decoder = K.Input(shape=latent_dims)
+    x = input_decoder
 
-    # Reconstruction inverse avec gestion des dimensions
-    for n_filtres in reversed(filters[1:]):  # On ignore le premier filtre
+    for num_filters in reversed(filters[1:]):
         x = K.layers.Conv2D(
-            filters=n_filtres, kernel_size=(3, 3), padding='same', activation='relu')(x)
+            filters=num_filters, kernel_size=(3, 3),
+            padding='same', activation='relu')(x)
         x = K.layers.UpSampling2D(size=(2, 2))(x)
 
-    # Couche spéciale pour ajuster les dimensions
     x = K.layers.Conv2D(
-        filters=filters[0], kernel_size=(3, 3), padding='valid', activation='relu')(x)
+        filters=filters[0], kernel_size=(3, 3),
+        padding='valid', activation='relu')(x)
     x = K.layers.UpSampling2D(size=(2, 2))(x)
 
-    # Dernière couche de reconstruction
-    sortie_decodeur = K.layers.Conv2D(
-        filters=input_dims[2], kernel_size=(3, 3), activation='sigmoid', padding='same')(x)
+    output_decoder = K.layers.Conv2D(
+        filters=input_dims[2], kernel_size=(3, 3),
+        activation='sigmoid', padding='same')(x)
 
-    decodeur = K.models.Model(inputs=entree_decodeur, outputs=sortie_decodeur)
+    decoder = K.models.Model(inputs=input_decoder, outputs=output_decoder)
 
-    # Assemblage final corrigé
-    sortie_autoencodeur = decodeur(encodeur(entree_encodeur))
-    autoencodeur_complet = K.models.Model(
-        inputs=entree_encodeur, outputs=sortie_autoencodeur
+    output_autoencoder = decoder(encoder(input_encoder))
+    autoencoder_model = K.models.Model(
+        inputs=input_encoder, outputs=output_autoencoder
     )
 
-    # Configuration de l'apprentissage
-    autoencodeur_complet.compile(optimizer='adam', loss='binary_crossentropy')
+    autoencoder_model.compile(optimizer='adam', loss='binary_crossentropy')
 
-    return encodeur, decodeur, autoencodeur_complet
+    return encoder, decoder, autoencoder_model
