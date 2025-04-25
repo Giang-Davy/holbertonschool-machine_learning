@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""3-variational.py"""
+
 
 import tensorflow.keras as K
 
@@ -19,7 +21,8 @@ def vae_loss(inputs, outputs, z_mean, z_log_var, input_dims):
     """
     reconstruction_loss = K.losses.binary_crossentropy(inputs, outputs)
     reconstruction_loss *= input_dims  # Scale by input dimensions
-    kl_loss = 1 + z_log_var - K.backend.square(z_mean) - K.backend.exp(z_log_var)
+    kl_loss = 1 + z_log_var - K.backend.square(
+        z_mean) - K.backend.exp(z_log_var)
     kl_loss = -0.5 * K.backend.sum(kl_loss, axis=-1)
     return K.backend.mean(reconstruction_loss + kl_loss)
 
