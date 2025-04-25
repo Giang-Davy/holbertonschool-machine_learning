@@ -28,6 +28,7 @@ def vae_loss(inputs, outputs, z_mean, z_log_var, input_dims):
 
 
 def autoencoder(input_dims, hidden_layers, latent_dims):
+    """autoencodeur"""
     # Encoder
     inputs = K.Input(shape=(input_dims,))
     x = inputs
