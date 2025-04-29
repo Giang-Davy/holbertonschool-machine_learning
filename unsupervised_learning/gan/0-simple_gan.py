@@ -61,7 +61,7 @@ class Simple_GAN(keras.Model) :
                 
                 # Calculer la perte totale du discriminateur
                 loss_diff = tf.keras.losses.MeanSquaredError()(tf.ones_like(loss_real), loss_real) + \
-                            tf.keras.losses.MeanSquaredError()(tf.zeros_like(loss_fake), loss_fake)
+                    tf.keras.losses.MeanSquaredError()(-1 * tf.ones_like(loss_fake), loss_fake)
             
             # Calculer les gradients du discriminateur
             gradients = tape.gradient(loss_diff, self.discriminator.trainable_variables)
