@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 
 
 class Simple_GAN(keras.Model):
+    """classe de GAN simple"""
     def __init__(self, generator, discriminator, latent_generator,
                  real_examples, batch_size=200, disc_iter=2,
                  learning_rate=0.005):
