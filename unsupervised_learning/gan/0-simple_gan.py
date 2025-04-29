@@ -49,7 +49,6 @@ class Simple_GAN(keras.Model) :
              
     # overloading train_step()    
     def train_step(self, useless_argument):
-        # Entraînement du discriminateur
         for _ in range(self.disc_iter):
             with tf.GradientTape() as tape:
                 # Générer un échantillon réel et un échantillon faux
@@ -60,14 +59,14 @@ class Simple_GAN(keras.Model) :
                 loss_real = self.discriminator(real_sample)
                 loss_fake = self.discriminator(fake_sample)
                 
-                # Calculer la perte totale du discriminateur (MSE entre les prédictions et les valeurs cibles)
+                # Calculer la perte totale du discriminateur
                 loss_diff = tf.keras.losses.MeanSquaredError()(tf.ones_like(loss_real), loss_real) + \
-                            tf.keras.losses.MeanSquaredError()(tf.ones_like(loss_fake), loss_fake)
+                            tf.keras.losses.MeanSquaredError()(tf.zeros_like(loss_fake), loss_fake)
             
-            # Calculer les gradients du discriminateur par rapport à ses variables d'entraînement
+            # Calculer les gradients du discriminateur
             gradients = tape.gradient(loss_diff, self.discriminator.trainable_variables)
             
-            # Appliquer les gradients pour mettre à jour les poids du discriminateur
+            # Appliquer les gradients
             self.discriminator.optimizer.apply_gradients(zip(gradients, self.discriminator.trainable_variables))
         
         # Entraînement du générateur
@@ -75,14 +74,14 @@ class Simple_GAN(keras.Model) :
             # Générer un échantillon faux
             fake_sample = self.get_fake_sample(training=True)
             
-            # Calculer la perte du générateur (MSE entre les prédictions du discriminateur et la cible "réel" pour les faux échantillons)
-            gen_loss = tf.keras.losses.MeanSquaredError()(tf.ones_like(fake_sample), self.discriminator(fake_sample))
+            # Calculer la perte du générateur
+            gen_loss = tf.keras.losses.MeanSquaredError()(tf.ones_like(self.discriminator(fake_sample)), self.discriminator(fake_sample))
         
-        # Calculer les gradients du générateur par rapport à ses variables d'entraînement
+        # Calculer les gradients du générateur
         gradients = tape.gradient(gen_loss, self.generator.trainable_variables)
         
-        # Appliquer les gradients pour mettre à jour les poids du générateur
+        # Appliquer les gradients
         self.generator.optimizer.apply_gradients(zip(gradients, self.generator.trainable_variables))
         
-        # Retourner les pertes pour le suivi de l'entraînement
+        # Retourner les pertes
         return {"discr_loss": loss_diff, "gen_loss": gen_loss}
