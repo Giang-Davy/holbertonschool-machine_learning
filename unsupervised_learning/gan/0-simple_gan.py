@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""0-simple_gan.py"""
 
 import tensorflow as tf
 from tensorflow import keras
