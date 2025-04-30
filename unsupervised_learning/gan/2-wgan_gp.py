@@ -37,10 +37,7 @@ class WGAN_GP(keras.Model):
         self.scal_shape = tf.convert_to_tensor(self.scal_shape)
 
         # Define the generator loss and optimizer:
-        def generator_loss(fake_output):
-            return -tf.reduce_mean(fake_output)
-
-        self.generator.loss = generator_loss
+        self.generator.loss = lambda x: -tf.reduce_mean(discriminator(x))
         self.generator.optimizer = keras.optimizers.Adam(
             learning_rate=self.learning_rate,
             beta_1=self.beta_1, beta_2=self.beta_2
@@ -49,10 +46,8 @@ class WGAN_GP(keras.Model):
             optimizer=generator.optimizer, loss=generator.loss)
 
         # Define the discriminator loss and optimizer:
-        def discriminator_loss(real_output, fake_output):
-            return tf.reduce_mean(real_output) - tf.reduce_mean(fake_output)
-
-        self.discriminator.loss = discriminator_loss
+        self.discriminator.loss = (
+            lambda x, y: tf.reduce_mean(x) - tf.reduce_mean(y))
         self.discriminator.optimizer = keras.optimizers.Adam(
             learning_rate=self.learning_rate,
             beta_1=self.beta_1, beta_2=self.beta_2
@@ -124,4 +119,4 @@ class WGAN_GP(keras.Model):
             zip(gradients, self.generator.trainable_variables)
         )
 
-        return {"discr_loss": loss_discriminator, "gen_loss": gen_loss}
+        return {"discr_loss": loss_discriminator, "gen_loss": gen_loss, "gp": penalty}
