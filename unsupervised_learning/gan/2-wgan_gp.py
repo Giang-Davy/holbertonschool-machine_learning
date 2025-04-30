@@ -97,14 +97,12 @@ class WGAN_GP(keras.Model):
                 loss_real = self.discriminator(real_sample)
                 loss_fake = self.discriminator(fake_sample)
 
-                loss_discriminator = (
-                    tf.math.reduce_mean(loss_fake) -
-                    tf.math.reduce_mean(loss_real) +
-                    self.lambda_gp * penalty
-                )
+                loss_discriminator = self.discriminator.loss(loss_real, loss_fake)
+                gp = self.gradient_penalty(interpolated_sample)
+                new_discr_loss = loss_discriminator + self.lambda_gp * gp
 
             gradients = tape.gradient(
-                loss_discriminator, self.discriminator.trainable_variables
+                new_discr_loss, self.discriminator.trainable_variables
             )
             self.discriminator.optimizer.apply_gradients(
                 zip(gradients, self.discriminator.trainable_variables)
