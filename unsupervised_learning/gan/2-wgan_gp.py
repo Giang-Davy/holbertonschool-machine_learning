@@ -92,14 +92,19 @@ class WGAN_GP(keras.Model):
                 fake_sample = self.get_fake_sample(size=None, training=False)
                 interpolated_sample = self.get_interpolated_sample(
                     real_sample, fake_sample)
-                penalty = self.gradient_penalty(interpolated_sample)
 
-                loss_real = self.discriminator(real_sample)
-                loss_fake = self.discriminator(fake_sample)
-
-                loss_discriminator = self.discriminator.loss(loss_real, loss_fake)
+                # Compute gradient penalty separately
                 gp = self.gradient_penalty(interpolated_sample)
-                new_discr_loss = loss_discriminator + self.lambda_gp * gp
+
+                # Compute discriminator loss separately
+                real_output = self.discriminator(real_sample, training=True)
+                fake_output = self.discriminator(fake_sample, training=True)
+                discr_loss = (
+                    tf.reduce_mean(fake_output) - tf.reduce_mean(real_output)
+                )
+
+                # Combine discr_loss with gradient penalty
+                new_discr_loss = discr_loss + self.lambda_gp * gp
 
             gradients = tape.gradient(
                 new_discr_loss, self.discriminator.trainable_variables
@@ -110,11 +115,12 @@ class WGAN_GP(keras.Model):
 
         with tf.GradientTape() as tape:
             fake_sample = self.get_fake_sample(training=True)
-            gen_loss = -tf.math.reduce_mean(self.discriminator(fake_sample))
+            gen_loss = -tf.reduce_mean(self.discriminator(fake_sample))
 
         gradients = tape.gradient(gen_loss, self.generator.trainable_variables)
         self.generator.optimizer.apply_gradients(
             zip(gradients, self.generator.trainable_variables)
         )
 
-        return {"discr_loss": loss_discriminator, "gen_loss": gen_loss, "gp": penalty}
+        # Return the raw discr_loss (without penalty) for monitoring
+        return {"discr_loss": discr_loss, "gen_loss": gen_loss, "gp": gp}
