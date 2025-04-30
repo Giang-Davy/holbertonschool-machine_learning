@@ -27,14 +27,11 @@ class WGAN_GP(keras.Model):
         self.beta_2 = 0.9  # Standard value, but can be changed if necessary
 
         self.lambda_gp = lambda_gp
-        self.dims = self.real_examples.shape
+        # Correction pour self.scal_shape et self.axis
+        self.dims = tf.shape(self.real_examples)  # Utilisation de tf.shape pour des dimensions dynamiques
         self.len_dims = tf.size(self.dims)
-        self.axis = tf.range(1, self.len_dims, delta=1, dtype='int32')
-        self.scal_shape = self.dims.as_list()
-        self.scal_shape[0] = self.batch_size
-        for i in range(1, self.len_dims):
-            self.scal_shape[i] = 1
-        self.scal_shape = tf.convert_to_tensor(self.scal_shape)
+        self.axis = tf.range(1, self.len_dims)  # Pas besoin de delta=1, c'est par défaut
+        self.scal_shape = tf.concat([[self.batch_size], tf.ones(self.len_dims - 1, dtype=tf.int32)], axis=0)
 
         # Define the generator loss and optimizer:
         self.generator.loss = lambda x: -tf.reduce_mean(discriminator(x))
