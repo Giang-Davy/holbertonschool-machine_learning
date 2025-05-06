@@ -6,15 +6,18 @@ import numpy as np
 
 
 def rnn(rnn_cell, X, h_0):
-    """foward propagation"""
-    t, m, i = X.shape
-    h_prev = h_0
-    H = []
-    Y = []
-    for k in range(t):
-        x_t = X[k]
-        h_next, y = rnn_cell.forward(h_prev, x_t)
-        H.append(h_next)
-        Y.append(y)
-        h_prev = h_next
-    return np.array(H), np.array(Y)
+    """forward propagation"""
+    t, m, i = X.shape  # Dimensions de X : t (time steps), m (batch size), i (input size)
+    h_prev = h_0  # Initialisation de h_prev avec h_0 (état caché initial)
+    H = np.zeros((t, m, h_prev.shape[1]))  # Tableau pour stocker tous les états cachés
+    Y = np.zeros((t, m, rnn_cell.Wy.shape[1]))  # Tableau pour stocker toutes les sorties
+
+    for step in range(t):
+        x_t = X[step]  # Données d'entrée au temps step
+        h_next, y = rnn_cell.forward(h_prev, x_t)  # Propagation avant
+        H[step] = h_next  # Stocker le nouvel état caché
+        Y[step] = y  # Stocker la sortie
+        h_prev = h_next  # Mettre à jour h_prev pour la prochaine itération
+
+    return H, Y
+
