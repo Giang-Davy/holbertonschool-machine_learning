@@ -19,17 +19,24 @@ class GRUCell:
 
     def forward(self, h_prev, x_t):
         """Forward propagation"""
+        # Concatenate h_prev and x_t
         conc = np.concatenate((h_prev, x_t), axis=1)
+
+        # Update gate
         zt = self.sigmoid(np.dot(conc, self.Wz) + self.bz)
+
+        # Reset gate
         rt = self.sigmoid(np.dot(conc, self.Wr) + self.br)
-        # Calcul de h_next à partir de la porte de réinitialisation
+
+        # Candidate hidden state
         conc_reset = np.concatenate((rt * h_prev, x_t), axis=1)
-        h_next = np.tanh(np.dot(conc_reset, self.Wh) + self.bh)
-        # Calcul de la sortie finale en combinant h_prev et h_next via zt
-        ht = (1 - zt) * h_prev + zt * h_next
-        # Calcul de y
-        y = np.dot(ht, self.Wy) + self.by
-        # Application de softmax
+        h_tilde = np.tanh(np.dot(conc_reset, self.Wh) + self.bh)
+
+        # Next hidden state
+        h_next = (1 - zt) * h_prev + zt * h_tilde
+
+        # Output
+        y = np.dot(h_next, self.Wy) + self.by
         softmax_y = self.softmax(y)
 
         return h_next, softmax_y
