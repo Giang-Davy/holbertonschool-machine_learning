@@ -19,21 +19,17 @@ class GRUCell:
         self.br = np.zeros((1, h))
 
     def forward(self, h_prev, x_t):
-        """forward propagration"""
+        """Forward propagation for one time step"""
         conc = np.concatenate((h_prev, x_t), axis=1)
-        zt = 1 / (1 + np.exp(-np.dot(conc, self.Wz) + self.bz))
-        rt = 1 / (1 + np.exp(-np.dot(conc, self.Wr) + self.br))
-        # Calcul de h_next à partir de la porte de réinitialisation
+        zt = 1 / (1 + np.exp(-np.dot(conc, self.Wz) - self.bz))  # Update gate
+        rt = 1 / (1 + np.exp(-np.dot(conc, self.Wr) - self.br))  # Reset gate
         conc_reset = np.concatenate((rt * h_prev, x_t), axis=1)
-        h_next = np.tanh(np.dot(conc_reset, self.Wh) + self.bh)
-        # Calcul de la sortie finale en combinant h_prev et h_next via zt
-        ht = (1 - zt) * h_prev + zt * h_next
-        # Calcul de y
-        y = np.dot(ht, self.Wy) + self.by
-        # Application de softmax
+        h_next = np.tanh(np.dot(conc_reset, self.Wh) + self.bh)  # Candidate hidden state
+        ht = (1 - zt) * h_prev + zt * h_next  # Final hidden state
+        y = np.dot(ht, self.Wy) + self.by  # Output before softmax
         max_y = np.max(y, axis=1, keepdims=True)
         exp_y = np.exp(y - max_y)
         sum_y = np.sum(exp_y, axis=1, keepdims=True)
-        softmax_y = exp_y / sum_y
+        softmax_y = exp_y / sum_y  # Softmax output
 
         return h_next, softmax_y
