@@ -6,10 +6,9 @@ import numpy as np
 
 
 class GRUCell:
-    """Gated  Recurrent unit"""
+    """Gated Recurrent Unit"""
     def __init__(self, i, h, o):
         """initialisation"""
-        np.random.seed(0)
         self.Wh = np.random.randn(i + h, h)
         self.bh = np.zeros((1, h))
         self.Wz = np.random.randn(i + h, h)
@@ -20,21 +19,27 @@ class GRUCell:
         self.br = np.zeros((1, h))
 
     def forward(self, h_prev, x_t):
-        """forward propagration"""
+        """forward propagation"""
         conc = np.concatenate((h_prev, x_t), axis=1)
-        zt = 1 / (1 + np.exp(-np.dot(conc, self.Wz) + self.bz))
-        rt = 1 / (1 + np.exp(-np.dot(conc, self.Wr) + self.br))
+        zt = self.sigmoid(np.dot(conc, self.Wz) + self.bz)
+        rt = self.sigmoid(np.dot(conc, self.Wr) + self.br)
         # Calcul de h_next à partir de la porte de réinitialisation
         conc_reset = np.concatenate((rt * h_prev, x_t), axis=1)
-        h_next = np.tanh(np.dot(conc_reset, self.Wh) + self.bh)
+        h_t = np.tanh(np.dot(conc_reset, self.Wh) + self.bh)
         # Calcul de la sortie finale en combinant h_prev et h_next via zt
-        ht = (1 - zt) * h_prev + zt * h_next
+        h_next = (1 - zt) * h_prev + zt * h_t
         # Calcul de y
-        y = np.dot(ht, self.Wy) + self.by
-        # Application de softmax
-        max_y = np.max(y, axis=1, keepdims=True)
-        exp_y = np.exp(y - max_y)
-        sum_y = np.sum(exp_y, axis=1, keepdims=True)
-        softmax_y = exp_y / sum_y
+        y = self.softmax(np.dot(h_next, self.Wy) + self.by)
 
-        return h_next, softmax_y
+        return h_next, y
+
+    @staticmethod
+    def sigmoid(x):
+        """Applies the sigmoid activation function."""
+        return 1 / (1 + np.exp(-x))
+
+    @staticmethod
+    def softmax(x):
+        """Applies the softmax activation function."""
+        exp_x = np.exp(x - np.max(x, axis=1, keepdims=True))
+        return exp_x / exp_x.sum(axis=1, keepdims=True)
