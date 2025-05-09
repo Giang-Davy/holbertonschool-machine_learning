@@ -20,7 +20,7 @@ class BidirectionalCell:
         h_next = np.tanh(np.dot(np.concatenate((
             h_prev, x_t), axis=1), self.Whf) + self.bhf)
         return h_next
-    
+
     def backward(self, h_next, x_t):
         """bacward"""
         h_prev = h_next = np.tanh(np.dot(np.concatenate((
