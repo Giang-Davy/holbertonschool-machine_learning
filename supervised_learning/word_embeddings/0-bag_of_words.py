@@ -34,5 +34,6 @@ def bag_of_words(sentences, vocab=None):
                 index = features.index(word)
                 liste[index] += 1
     embeddings = np.array(embeddings)
+    features = np.array(features)
 
     return embeddings, features
