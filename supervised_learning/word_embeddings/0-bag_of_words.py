@@ -5,38 +5,40 @@
 import numpy as np
 import re
 
-
 def bag_of_words(sentences, vocab=None):
-    """baguage de mots"""
+    """
+    Creates a bag of words embedding matrix.
 
-    cleaned = []
+    Parameters:
+    - sentences (list of str): Sentences to analyze
+    - vocab (list of str or None): Vocabulary to use for analysis.
+                                    If None, it's built from sentences.
+
+    Returns:
+    - embeddings (np.ndarray): Matrix of shape (s, f) with word counts
+    - features (list of str): The vocabulary used
+    """
+    tokenized_sentences = []
     for sentence in sentences:
-        sentence = sentence.lower()
-        sentence = re.sub(r'[^a-z0-9\s]', '', sentence)
-        words = sentence.split()
-        cleaned.append(words)
+        # Simple word tokenization (lowercased words)
+        words = re.findall(r'\b\w+\b', sentence.lower())
+        tokenized_sentences.append(words)
 
     if vocab is None:
+        # Build vocab from all unique words
         vocab_set = set()
-        for sentence in cleaned:
-            for word in sentence:
-                vocab_set.add(word)
-        features = sorted(vocab_set)  # Trie pour garantir l'ordre
-    else:
-        features = list(vocab)  # S'assurer que c'est une liste, pas un np.array
+        for words in tokenized_sentences:
+            vocab_set.update(words)
+        vocab = sorted(vocab_set)
 
-    # Build word to index mapping for fast lookup
-    word2idx = {word: idx for idx, word in enumerate(features)}
+    # Mapping word to index
+    word_index = {word: idx for idx, word in enumerate(vocab)}
+    embeddings = np.zeros((len(sentences), len(vocab)), dtype=int)
 
-    embeddings = []
-    f = len(features)
-    for sentence in cleaned:
-        liste = np.zeros(f, dtype=int)
-        for word in sentence:
-            if word in word2idx:
-                liste[word2idx[word]] += 1
-        embeddings.append(liste)
-    embeddings = np.array(embeddings)
-    features = np.array(features)
+    for i, words in enumerate(tokenized_sentences):
+        for word in words:
+            if word in word_index:
+                embeddings[i, word_index[word]] += 1
 
-    return embeddings, features
+    return embeddings, vocab
+
