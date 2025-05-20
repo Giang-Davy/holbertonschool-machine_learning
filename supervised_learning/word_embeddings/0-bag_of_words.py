@@ -22,17 +22,20 @@ def bag_of_words(sentences, vocab=None):
             for word in sentence:
                 vocab_set.add(word)
         features = sorted(vocab_set)
+    else:
+        features = vocab
+
+    # Build word to index mapping for fast lookup
+    word2idx = {word: idx for idx, word in enumerate(features)}
 
     embeddings = []
-    s = len(sentences)
     f = len(features)
     for sentence in cleaned:
         liste = np.zeros(f, dtype=int)
-        embeddings.append(liste)
         for word in sentence:
-            if word in features:
-                index = features.index(word)
-                liste[index] += 1
+            if word in word2idx:
+                liste[word2idx[word]] += 1
+        embeddings.append(liste)
     embeddings = np.array(embeddings)
     features = np.array(features)
 
