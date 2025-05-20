@@ -21,9 +21,9 @@ def bag_of_words(sentences, vocab=None):
         for sentence in cleaned:
             for word in sentence:
                 vocab_set.add(word)
-        features = sorted(vocab_set)
+        features = sorted(vocab_set)  # Trie pour garantir l'ordre
     else:
-        features = vocab
+        features = list(vocab)  # S'assurer que c'est une liste, pas un np.array
 
     # Build word to index mapping for fast lookup
     word2idx = {word: idx for idx, word in enumerate(features)}
