@@ -27,11 +27,12 @@ def bag_of_words(sentences, vocab=None):
     s = len(sentences)
     f = len(features)
     for sentence in cleaned:
-        liste = np.zeros(f)
+        liste = np.zeros(f, dtype=int)
         embeddings.append(liste)
         for word in sentence:
             if word in features:
                 index = features.index(word)
                 liste[index] += 1
     embeddings = np.array(embeddings)
+
     return embeddings, features
