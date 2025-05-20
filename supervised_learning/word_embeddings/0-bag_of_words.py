@@ -21,17 +21,19 @@ def bag_of_words(sentences, vocab=None):
             for word in sentence:
                 vocab_set.add(word)
         features = sorted(vocab_set)
+    else:
+        features = vocab
 
-    embeddings = []
     s = len(sentences)
     f = len(features)
-    for sentence in cleaned:
-        liste = np.zeros(f, dtype=int)
-        embeddings.append(liste)
+    embeddings = np.zeros((s, f), dtype=int)
+
+    for i, sentence in enumerate(cleaned):
         for word in sentence:
             if word in features:
                 index = features.index(word)
-                liste[index] += 1
+                embeddings[i, index] += 1
+
     embeddings = np.array(embeddings)
     features = np.array(features)
 
