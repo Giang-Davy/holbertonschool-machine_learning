@@ -6,6 +6,7 @@ import math
 
 
 def ngram_bleu(references, sentence, n):
+    """ngram calcul"""
     ngrams = []
     for i in range(len(sentence) - n + 1):
         ngrams.append(tuple(sentence[i:i + n]))
