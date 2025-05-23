@@ -36,6 +36,18 @@ def ngram_bleu(references, sentence, n):
     if total_count == 0:
         return 0
 
+    # Trouver la longueur de référence la plus proche
+    ref_lens = [len(ref) for ref in references]
+    cand_len = len(sentence)
+    r = min(ref_lens, key=lambda ref_len: (abs(ref_len - cand_len), ref_len))
+
     precision = clipped_count / total_count
 
-    return precision
+    # Calcul du BP
+    if cand_len > r:
+        BP = 1
+    else:
+        BP = math.exp(1 - (r / cand_len))
+
+    BLEU = BP * precision
+    return BLEU
