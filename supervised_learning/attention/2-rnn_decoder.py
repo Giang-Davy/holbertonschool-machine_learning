@@ -23,15 +23,10 @@ class RNNDecoder(tf.keras.layers.Layer):
     def call(self, x, s_prev, hidden_states):
         """rappelle"""
         context, _ = self.attention(s_prev, hidden_states)
-        embedded = self.embedding(x)
-        # S'assurer que embedded a la forme (batch, 1, embedding_dim)
-        if len(embedded.shape) == 2:
-            embedded = tf.expand_dims(embedded, axis=1)
-        # context a déjà la forme (batch, units), on l'expand
-        context = tf.expand_dims(context, axis=1)
+        x = self.embedding(x)
         # Concaténation sur le dernier axe (features)
-        concat_result = tf.concat([embedded, context], axis=-1)
-        output, s = self.gru(concat_result, initial_state=s_prev)
+        x = tf.concat([tf.expand_dims(context, 1), x], axis=-1)
+        output, s = self.gru(x)
+        output = tf.squeeze(output, axis=1)
         y = self.F(output)
-        y = tf.squeeze(y, axis=1)
         return y, s
