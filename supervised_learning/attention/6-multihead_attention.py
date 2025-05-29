@@ -32,26 +32,17 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         # Reshape et transpose pour multi-head
         def split_heads(x):
             x = tf.reshape(x, (batch_size, seq_len, self.h, self.depth))
-            return tf.transpose(x, perm=[0, 2, 1, 3])  # [batch, h, seq_len, depth]
+            return tf.transpose(x, perm=[0, 2, 1, 3])
 
         q = split_heads(q)
         k = split_heads(k)
         v = split_heads(v)
 
-        # Fusionner batch et head pour sdp_attention ([batch*h, seq_len, depth])
-        def merge_heads(x):
-            return tf.reshape(x, (batch_size * self.h, seq_len, self.depth))
-
-        q_merged = merge_heads(q)
-        k_merged = merge_heads(k)
-        v_merged = merge_heads(v)
-
         # Attention
-        output, weights = sdp_attention(q_merged, k_merged, v_merged, mask)
+        output, weights = sdp_attention(q, k, v, mask)
 
-        # Séparer batch et head à nouveau
-        output = tf.reshape(output, (batch_size, self.h, seq_len, self.depth))
-        output = tf.transpose(output, perm=[0, 2, 1, 3])  # [batch, seq_len, h, depth]
+        # Concaténer les têtes
+        output = tf.transpose(output, perm=[0, 2, 1, 3])
         output = tf.reshape(output, (batch_size, seq_len, self.dm))
         output = self.linear(output)
 

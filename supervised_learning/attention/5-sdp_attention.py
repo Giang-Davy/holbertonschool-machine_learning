@@ -21,29 +21,29 @@ class MultiHeadAttention(tf.keras.layers.Layer):
 
     def call(self, Q, K, V, mask):
         """rappelle"""
+        batch_size = tf.shape(Q)[0]
+        seq_len = tf.shape(Q)[1]
+
+        # Projeter Q, K, V
         q = self.Wq(Q)
         k = self.Wk(K)
         v = self.Wv(V)
-        #  obtenir le tuple nécéssaire pour le reshape
-        batchq = tf.shape(Q)[0]
-        batch2q = tf.shape(Q)[1]
-        reshapeq = tf.reshape(q, [batchq, batch2q, self.h ,self.depth])
-        #  mettre self.h comme deuxième dimension.
-        q = tf.transpose(reshapeq, perm=[0, 2, 1, 3])
-        #  refaire pareil pour k et v
-        batchk = tf.shape(K)[0]
-        batch2k = tf.shape(K)[1]
-        reshapek = tf.reshape(k, [batchk, batch2k, self.h ,self.depth])
-        k = tf.transpose(reshapek, perm=[0, 2, 1, 3])
-        #  v
-        batchv = tf.shape(V)[0]
-        batch2v = tf.shape(V)[1]
-        reshapev = tf.reshape(v, [batchv, batch2v, self.h ,self.depth])
-        v = tf.transpose(reshapev, perm=[0, 2, 1, 3])
-        #  appelle de la fonction 5-sdp attention
+
+        # Reshape et transpose pour multi-head
+        def split_heads(x):
+            x = tf.reshape(x, (batch_size, seq_len, self.h, self.depth))
+            return tf.transpose(x, perm=[0, 2, 1, 3])
+
+        q = split_heads(q)
+        k = split_heads(k)
+        v = split_heads(v)
+
+        # Attention
         output, weights = sdp_attention(q, k, v, mask)
+
+        # Concaténer les têtes
         output = tf.transpose(output, perm=[0, 2, 1, 3])
-        output = tf.reshape(output, [batchq, batch2q, self.dm])
+        output = tf.reshape(output, (batch_size, seq_len, self.dm))
         output = self.linear(output)
 
         return output, weights
