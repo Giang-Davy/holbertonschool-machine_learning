@@ -45,5 +45,6 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         output = tf.transpose(output, perm=[0, 2, 1, 3])
         output = tf.reshape(output, (batch_size, seq_len, self.dm))
         output = self.linear(output)
-
+        output = tf.constant(output, dtype=tf.float32)
+        weights =  tf.constant(weights, dtype=tf.float32)
         return output, weights
