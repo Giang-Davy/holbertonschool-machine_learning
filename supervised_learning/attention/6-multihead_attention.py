@@ -22,7 +22,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
     def call(self, Q, K, V, mask):
         """rappelle"""
         batch_size = tf.shape(Q)[0]
-        seq_len = tf.shape(Q)[1]
+        q_seq_len = tf.shape(Q)[1]  # Ajouté
 
         # Projeter Q, K, V
         q = self.Wq(Q)
@@ -31,6 +31,9 @@ class MultiHeadAttention(tf.keras.layers.Layer):
 
         # Reshape et transpose pour multi-head
         def split_heads(x):
+            shape = tf.shape(x)
+            batch_size = shape[0]
+            seq_len = shape[1]
             x = tf.reshape(x, (batch_size, seq_len, self.h, self.depth))
             return tf.transpose(x, perm=[0, 2, 1, 3])
 
@@ -43,7 +46,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
 
         # Concaténer les têtes
         output = tf.transpose(output, perm=[0, 2, 1, 3])
-        output = tf.reshape(output, (batch_size, seq_len, self.dm))
+        output = tf.reshape(output, (batch_size, q_seq_len, self.dm))  # Correction ici
         output = self.linear(output)
 
         return output, weights
