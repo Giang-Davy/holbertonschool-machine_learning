@@ -1,20 +1,26 @@
 #!/usr/bin/env python3
+"""0-dataset.py"""
+
 
 import tensorflow_datasets as tfds
 import transformers
 
 
 class Dataset:
+    """classe"""
     def __init__(self):
+        """initialisation"""
         self.data_train, self.data_valid = tfds.load(
             'ted_hrlr_translate/pt_to_en',
             split=['train', 'validation'],
             as_supervised=True
         )
 
-        self.tokenizer_pt, self.tokenizer_en = self.tokenize_dataset(self.data_train)
+        self.tokenizer_pt, self.tokenizer_en = self.tokenize_dataset(
+            self.data_train)
 
     def tokenize_dataset(self, data):
+        """token"""
         pt_sentences = []
         en_sentences = []
 
@@ -29,7 +35,9 @@ class Dataset:
             'bert-base-uncased'
         )
 
-        pt_tokenizer.train_new_from_iterator(pt_sentences, vocab_size=2**13)
-        en_tokenizer.train_new_from_iterator(en_sentences, vocab_size=2**13)
+        pt_tokenizer = pt_tokenizer.train_new_from_iterator(
+            pt_sentences, vocab_size=2**13)
+        en_tokenizer = en_tokenizer.train_new_from_iterator(
+            en_sentences, vocab_size=2**13)
 
         return pt_tokenizer, en_tokenizer
