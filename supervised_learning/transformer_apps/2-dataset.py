@@ -5,7 +5,6 @@
 import tensorflow_datasets as tfds
 import transformers
 import tensorflow as tf
-import numpy as np
 
 
 class Dataset:
@@ -64,7 +63,7 @@ class Dataset:
         tokens_en = self.tokenizer_en.encode(en, add_special_tokens=False)
         tokens_en = [vocab_size_en] + tokens_en + [vocab_size_en + 1]
 
-        return np.array(tokens_pt), np.array(tokens_en)
+        return tokens_pt, tokens_en
 
     def tf_encode(self, pt, en):
         """tf_encode"""
