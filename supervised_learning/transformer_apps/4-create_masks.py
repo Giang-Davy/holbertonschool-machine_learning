@@ -2,8 +2,6 @@
 """4-create_masks.py"""
 
 
-import tensorflow_datasets as tfds
-import transformers
 import tensorflow as tf
 
 
@@ -26,7 +24,8 @@ def create_masks(inputs, target):
 
     #  ------Combined Mask-------
     seq_len = tf.shape(target)[1]
-    look_ahead_mask = 1 - tf.linalg.band_part(tf.ones((seq_len, seq_len)), -1, 0)
+    look_ahead_mask = 1 - tf.linalg.band_part(
+        tf.ones((seq_len, seq_len)), -1, 0)
 
     tgt_padding_mask = tf.cast(tf.math.equal(target, 0), tf.float32)
     tgt_padding_mask = tf.expand_dims(tgt_padding_mask, axis=1)
