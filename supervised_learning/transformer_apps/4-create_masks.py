@@ -33,4 +33,4 @@ def create_masks(inputs, target):
 
     combined_mask = tf.maximum(look_ahead_mask, tgt_padding_mask)
 
-    return encoder_mask, decoder_mask, combined_mask
+    return encoder_mask, combined_mask, decoder_mask
