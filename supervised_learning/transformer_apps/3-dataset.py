@@ -26,19 +26,18 @@ class Dataset:
         self.data_train = self.data_train.cache()
         self.data_train = self.data_train.shuffle(20000)
         self.data_train = self.data_train.padded_batch(batch_size)
-        self.data_train = self.data_train.prefetch(tf.data.experimental.AUTOTUNE)
+        self.data_train = self.data_train.prefetch(
+            tf.data.experimental.AUTOTUNE)
         self.data_valid = self.data_valid.map(self.tf_encode)
         self.data_valid = self.data_valid.filter(self.filter_max_len)
         self.data_valid = self.data_valid.padded_batch(batch_size)
-    
+
     def filter_max_len(self, pt, en):
         """filtre les phrases trop longues"""
         #  Si pt et en sont plus grand que max len, on applique le filtre
         return tf.logical_and(
             tf.size(pt) <= self.max_len,
-            tf.size(en) <= self.max_len
-        )
-        
+            tf.size(en) <= self.max_len)
 
     def tokenize_dataset(self, data):
         """token"""
