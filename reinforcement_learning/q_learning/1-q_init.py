@@ -2,7 +2,6 @@
 """1-q_init.py"""
 
 
-import gymnasium as gym
 import numpy as np
 
 
