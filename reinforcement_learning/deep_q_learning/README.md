@@ -9,6 +9,7 @@ pip install -r requirements.txt
 AutoROM --accept-license
 ```
 3. **Modification du fichier Callback.py pour la compatibilité**
+
 Dans une machine local window:
 ```bash
 # Modifier "Python310" selon sa version de Python  
