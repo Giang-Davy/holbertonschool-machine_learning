@@ -32,4 +32,8 @@ def play(env, Q, max_steps=100):
         if done:
             break
 
+    # Ajouter le rendu final après la dernière action
+    render = env.render()
+    render_list.append(render)
+
     return rewards, render_list
