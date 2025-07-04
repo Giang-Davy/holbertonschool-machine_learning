@@ -38,4 +38,4 @@ Pour tester l'agent entraîné
 ```bash
 python3 play.py
 ```
-Attention, l'entraînement peut prendre plusieurs heures, l'agent déjà entrainé est mis à disposition pour éviter cela, sous le nom de "policy.h5". Donc exécuter directement le fichier "play.py".
+Attention, l'entraînement peut prendre plusieurs heures, l'agent déjà entrainé est mis à disposition pour éviter cela, sous le nom de "policy.h5". Donc si vous le voulez, exécuter directement le fichier "play.py".
