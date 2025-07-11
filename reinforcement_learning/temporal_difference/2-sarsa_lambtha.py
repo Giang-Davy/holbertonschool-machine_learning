@@ -28,10 +28,10 @@ def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100,
             e[state, action] += 1
             Q += alpha * delta * e
             e *= gamma * lambtha
-            state = next_state
-            action = next_action
             if terminated or truncated:
                 break
+            state = next_state
+            action = next_action
         # Epsilon decay à chaque épisode
         epsilon = max(epsilon * (1 - epsilon_decay), min_epsilon)
     return Q
