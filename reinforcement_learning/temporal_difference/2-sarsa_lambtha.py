@@ -33,5 +33,5 @@ def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100,
             e *= gamma * lambtha
             state = next_state
             action = next_action
-            # epsilon = max(epsilon*(1-epsilon_decay), min_epsilon)
+            epsilon = max(epsilon*(1-epsilon_decay), min_epsilon)
             return Q
