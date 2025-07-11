@@ -26,12 +26,12 @@ def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100,
                 next_action = np.argmax(Q[next_state])
             delta = reward + gamma * Q[next_state][next_action] - Q[state][action]
             e[state, action] += 1
-            Q += alpha * delta * e
             e *= gamma * lambtha
-            if terminated or truncated:
-                break
+            Q += alpha * delta * e
             state = next_state
             action = next_action
         # Epsilon decay à chaque épisode
+        if terminated or truncated:
+                break
         epsilon = max(epsilon * (1 - epsilon_decay), min_epsilon)
     return Q
