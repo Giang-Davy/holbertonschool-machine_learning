@@ -27,8 +27,8 @@ def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100,
             delta = reward + gamma * Q[
                 next_state][next_action] - Q[state][action]
             eligibility_traces[state, action] += 1
-            eligibility_traces *= lambtha * gamma
             Q += alpha * delta * eligibility_traces
+            eligibility_traces *= lambtha * gamma
             if terminated or truncated:
                 break
             state = next_state
