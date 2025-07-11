@@ -6,6 +6,7 @@ import numpy as np
 
 
 def epsilon_greedy(Q, state, epsilon):
+    """choix pour epsilon"""
     if np.random.uniform(0, 1) > epsilon:
         return np.argmax(Q[state, :])
     else:
