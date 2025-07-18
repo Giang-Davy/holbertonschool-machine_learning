@@ -11,9 +11,6 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
     Affiche le score à chaque épisode.
     """
 
-    import numpy as np
-    policy_gradient = __import__('policy_gradient').policy_gradient
-
     # Historique des scores par épisode
     scores = []
 
