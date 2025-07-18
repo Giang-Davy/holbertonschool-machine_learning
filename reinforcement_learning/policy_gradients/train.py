@@ -7,7 +7,7 @@ policy_gradient = __import__('policy_gradient').policy_gradient
 
 def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
     """
-    Entraînement 
+    Entraînement
     """
 
     # Historique des scores par épisode
@@ -41,8 +41,8 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98):
             historique_recompenses.append(recompense)
 
             # Mise à jour des poids avec la règle du gradient de politique
-            for t, (g, r) in enumerate(zip(
-                historique_gradients, historique_recompenses)):
+            for t, (g, r) in enumerate(zip(historique_gradients,
+                                           historique_recompenses)):
                 poids += alpha * g * (gamma ** t) * r
 
             if episode_termine:
