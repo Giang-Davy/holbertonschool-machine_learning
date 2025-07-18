@@ -51,9 +51,9 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98, show_result=False):
             if show_result is True and episode % 1000 == 0:
                 env.render()
 
-        env.close()
         scores.append(sum(historique_recompenses))
-
+        
         # Affichage du score de l’épisode courant
         print(f"Episode: {episode} Score: {sum(historique_recompenses)}")
+    env.close()
     return scores
