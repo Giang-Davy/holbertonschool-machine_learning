@@ -1,94 +1,102 @@
 #!/usr/bin/env python3
-"""train.py"""
+"""
+Script d'entraînement d'un agent DQN pour Breakout (version modifiée)
 
+Ce fichier implémente une approche DQN avec prétraitement visuel et un
+réseau convolutif. Il est adapté pour l'utilisation avec keras-rl2 et
+assure la compatibilité avec les environnements Gymnasium.
+"""
 
-import gymnasium as gym
 import numpy as np
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Flatten, Conv2D, Permute
+from PIL import Image
+import gymnasium as gym
+from keras.models import Sequential
+from keras.layers import Dense, Activation, Flatten, Convolution2D, Permute
 from tensorflow.keras.optimizers.legacy import Adam
 from rl.agents.dqn import DQNAgent
+from rl.policy import LinearAnnealedPolicy, EpsGreedyQPolicy
 from rl.memory import SequentialMemory
-from rl.policy import EpsGreedyQPolicy
-from gymnasium.wrappers import AtariPreprocessing
+from rl.core import Processor
 
 
-# Wrapper pour compatibilité avec l'API Gym classique
-class CompatibilityWrapper(gym.Wrapper):
+class CompatEnv:
+    def __init__(self, env):
+        self._env = env
+        self.action_space = env.action_space
+        self.observation_space = env.observation_space
+
+    def reset(self):
+        obs, _ = self._env.reset()
+        return obs
+
     def step(self, action):
-        obs, reward, terminated, truncated, info = self.env.step(action)
-        done = terminated or truncated
-        return obs, reward, done, info
+        obs, reward, terminated, truncated, info = self._env.step(action)
+        return obs, reward, terminated or truncated, info
 
-    def reset(self, **kwargs):
-        result = self.env.reset(**kwargs)
-        if isinstance(result, tuple):
-            obs = result[0]
-        else:
-            obs = result
-        return obs
+    def render(self, *args, **kwargs):
+        return self._env.render()
+
+    def close(self):
+        self._env.close()
 
 
-# Appuie automatiquement sur FIRE après chaque reset si nécessaire
-class FireResetWrapper(gym.Wrapper):
-    def reset(self, **kwargs):
-        obs = self.env.reset(**kwargs)
-        # Si l'action 1 (FIRE) est valide, on la joue pour lancer la balle
-        if hasattr(self.env, 'unwrapped') and hasattr(self.env.unwrapped,
-                                                      'ale'):
-            if self.env.unwrapped.ale.lives() == 5:
-                obs, _, done, _ = self.env.step(1)
-                if done:
-                    obs = self.env.reset(**kwargs)
-        return obs
+class FrameProcessor(Processor):
+    def process_observation(self, observation):
+        assert observation.ndim == 3
+        image = Image.fromarray(observation)
+        image = image.resize((84, 84)).convert('L')
+        return np.array(image).astype('uint8')
+
+    def process_state_batch(self, batch):
+        return batch.astype('float32') / 255.
+
+    def process_reward(self, reward):
+        return np.clip(reward, -1., 1.)
 
 
-def create_atari_environment(env_name):
-    env = gym.make(env_name, frameskip=1)
-    env = AtariPreprocessing(env, screen_size=84,
-                             grayscale_obs=True,
-                             frame_skip=1, noop_max=30)
-    env = CompatibilityWrapper(env)
-    env = FireResetWrapper(env)  # Ajoute ce wrapper en dernier
-    return env
-
-
-def build_model(window_length, shape, actions):
+def create_network(action_size):
     model = Sequential()
-    # Permute pour adapter la forme des entrées au CNN
-    model.add(Permute((2, 3, 1), input_shape=(window_length,) + shape))
-    model.add(Conv2D(32, (8, 8), strides=(4, 4), activation='relu'))
-    model.add(Conv2D(64, (4, 4), strides=(2, 2), activation='relu'))
-    model.add(Conv2D(64, (3, 3), strides=(1, 1), activation='relu'))
+    model.add(Permute((2, 3, 1), input_shape=(4, 84, 84)))
+    model.add(Convolution2D(32, (8, 8), strides=(4, 4)))
+    model.add(Activation('relu'))
+    model.add(Convolution2D(64, (4, 4), strides=(2, 2)))
+    model.add(Activation('relu'))
+    model.add(Convolution2D(64, (3, 3), strides=(1, 1)))
+    model.add(Activation('relu'))
     model.add(Flatten())
-    model.add(Dense(512, activation='relu'))
-    model.add(Dense(actions, activation='linear'))
+    model.add(Dense(512))
+    model.add(Activation('relu'))
+    model.add(Dense(action_size))
+    model.add(Activation('linear'))
     return model
 
 
-if __name__ == "__main__":
-    env = create_atari_environment('ALE/Breakout-v5')
-    nb_actions = env.action_space.n
-    window_length = 4
-    obs_shape = env.observation_space.shape  # (84, 84)
-    model = build_model(window_length, obs_shape, nb_actions)
+if __name__ == '__main__':
+    env = gym.make('Breakout-v0')
+    env = CompatEnv(env)
+    actions = env.action_space.n
+    model = create_network(actions)
+    model.summary()
 
-    memory = SequentialMemory(limit=1000000, window_length=window_length)
-    policy = EpsGreedyQPolicy()
-    dqn = DQNAgent(
-        model=model,
-        nb_actions=nb_actions,
-        memory=memory,
-        nb_steps_warmup=50000,
-        gamma=0.99,
-        target_model_update=10000,
-        train_interval=4,
-        delta_clip=1.0,
-        policy=policy
-    )
+    memory = SequentialMemory(limit=1000000, window_length=4)
+    processor = FrameProcessor()
+
+    policy = LinearAnnealedPolicy(EpsGreedyQPolicy(), attr='eps',
+                                  value_max=1.0, value_min=0.05, value_test=0.01,
+                                  nb_steps=50000)
+
+    dqn = DQNAgent(model=model,
+                   nb_actions=actions,
+                   memory=memory,
+                   processor=processor,
+                   policy=policy,
+                   nb_steps_warmup=10000,
+                   gamma=0.99,
+                   target_model_update=1000,
+                   train_interval=4,
+                   delta_clip=1.0)
     dqn.compile(Adam(learning_rate=0.00025), metrics=['mae'])
-    # Lance l'entraînement du DQN
-    dqn.fit(env, nb_steps=100000, visualize=False, verbose=2)
-    # Sauvegarde les poids entraînés
+
+    print("Training begins...")
+    dqn.fit(env, nb_steps=100000, visualize=False, verbose=2, nb_max_episode_steps=10000)
     dqn.save_weights('policy.h5', overwrite=True)
-    env.close()
