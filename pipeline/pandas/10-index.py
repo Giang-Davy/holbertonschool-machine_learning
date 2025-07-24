@@ -3,6 +3,6 @@
 
 
 def index(df):
-    """tim"""
+    """mettre timestamp sur le colonne de la dataframe"""
     df = df.set_index("Timestamp")
     return df
