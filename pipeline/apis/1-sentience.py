@@ -22,7 +22,9 @@ def sentientPlanets():
         data = response.json()
         results = data['results']
         for i in results:
-            if (i['designation'].lower() == 'sentient' or i['classification'].lower() == 'sentient'):
+            if (i[
+                'designation'].lower() == 'sentient' or i[
+                    'classification'].lower() == 'sentient'):
                 if i["homeworld"] is None:
                     continue
                 else:
