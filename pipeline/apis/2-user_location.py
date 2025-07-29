@@ -5,6 +5,7 @@
 import sys
 import requests
 import time
+import math
 
 
 def userlocation(url):
@@ -17,7 +18,7 @@ def userlocation(url):
     if response.status_code == 403:
         reset_timestamp = int(response.headers.get('X-RateLimit-Reset', 0))
         reset_in = (reset_timestamp - time.time()) / 60
-        print(f"Reset in {int(reset_in)} min")
+        print(f"Reset in {math.ceil(reset_in)} min")
         return
     if response.status_code == 404:
         return None
