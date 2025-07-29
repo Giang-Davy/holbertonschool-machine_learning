@@ -26,7 +26,9 @@ def userlocation(url):
 
 if __name__ == '__main__':
     location = userlocation(sys.argv[1])
-    if location is None:
-        print("Not found")
-    else:
+    if location is None and len(sys.argv) > 1:
+        response = requests.get(sys.argv[1])
+        if response.status_code != 403:
+            print("Not found")
+    elif location is not None:
         print(location)
