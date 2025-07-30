@@ -1,36 +1,46 @@
 #!/usr/bin/env python3
-"""3-first_launch.py"""
+"""Fetch and display the first upcoming SpaceX launch details."""
 
 
 import requests
 
 
-def get_first_launch_info():
-    """Avoir les informations du premier lancement"""
-    url = "https://api.spacexdata.com/v4/launches"
-    response = requests.get(url)
+def get_first_upcoming_launch_info():
+    """Get the first upcoming SpaceX launch details in the required format."""
+    # Fetch all upcoming launches
+    response = requests.get('https://api.spacexdata.com/v4/launches/upcoming')
     response.raise_for_status()
-    data = response.json()
+    launches = response.json()
 
-    launch = sorted(data, key=lambda x: x['date_unix'])[0]
+    # Find the first upcoming launch based on date_unix
+    first_launch = min(launches, key=lambda x: x['date_unix'])
 
-    rocket_id = launch['rocket']
-    launchpad_id = launch['launchpad']
+    # Extract relevant information from the launch
+    launch_name = first_launch['name']
+    date_local = first_launch['date_local']
+    rocket_id = first_launch['rocket']
+    launchpad_id = first_launch['launchpad']
 
-    rocket = requests.get(
-        f'https://api.spacexdata.com/v4/rockets/{rocket_id}').json()
-    launchpad = requests.get(
-        f'https://api.spacexdata.com/v4/launchpads/{launchpad_id}').json()
+    # Fetch rocket information
+    rocket_response = requests.get(
+        f'https://api.spacexdata.com/v4/rockets/{rocket_id}'
+    )
+    rocket_response.raise_for_status()
+    rocket_name = rocket_response.json()['name']
 
-    name = launch['name']
-    date = launch['date_local']
-    rocket_name = rocket['name']
-    launchpad_name = launchpad['name']
-    launchpad_locality = launchpad['locality']
+    # Fetch launchpad information
+    launchpad_response = requests.get(
+        f'https://api.spacexdata.com/v4/launchpads/{launchpad_id}'
+    )
+    launchpad_response.raise_for_status()
+    launchpad_data = launchpad_response.json()
+    launchpad_name = launchpad_data['name']
+    launchpad_locality = launchpad_data['locality']
 
-    return (f"{name} ({date}) {rocket_name} - "
+    # Return the formatted information
+    return (f"{launch_name} ({date_local}) {rocket_name} - "
             f"{launchpad_name} ({launchpad_locality})")
 
 
-if __name__ == '__main__':
-    print(get_first_launch_info())
+if __name__ == "__main__":
+    print(get_first_upcoming_launch_info())
