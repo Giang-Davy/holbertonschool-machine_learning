@@ -8,24 +8,21 @@ import requests
 if __name__ == '__main__':
     url = "https://api.spacexdata.com/v4/launches"
     response = requests.get(url)
-    data = response.json()
+    response.raise_for_status()
+    launches = response.json()
 
-    launch = sorted(data, key=lambda x: x['date_unix'])[0]
+    # Sort by date_unix, stable sort keeps API order for ties
+    first_launch = sorted(launches, key=lambda x: x['date_unix'])[0]
 
-    rocket_id = launch['rocket']
-    launchpad_id = launch['launchpad']
+    rocket_id = first_launch['rocket']
+    launchpad_id = first_launch['launchpad']
 
     rocket = requests.get(
         f'https://api.spacexdata.com/v4/rockets/{rocket_id}').json()
     launchpad = requests.get(
         f'https://api.spacexdata.com/v4/launchpads/{launchpad_id}').json()
 
-    name = launch['name']
-    date = launch['date_local']
-    rocket = rocket['name']
-    launchpad_name = launchpad['name']
-    launchpad_locality = launchpad['locality']
-
     print(
-        f"{name} ({date}) {rocket} - {launchpad_name} ({launchpad_locality})"
+        f"{first_launch['name']} ({first_launch['date_local']}) "
+        f"{rocket['name']} - {launchpad['name']} ({launchpad['locality']})"
         )
