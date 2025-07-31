@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """4-rocket_frequency.py"""
 
+
 import requests
 
+
+def frequencerockets():
+    """compte le nombre de lancement par rockets"""
 count = {}
 response = requests.get('https://api.spacexdata.com/v4/launches')
 launches = response.json()
