@@ -32,3 +32,6 @@ def frequencerockets():
 
     for name, freq in result:
         print(f"{name}: {freq}")
+
+if __name__ == "__main__":
+    frequencerockets()
