@@ -1,4 +1,4 @@
--- Ajoute une correction pour un e√udiant
+-- ajoute une correction pour un e√udiant
 DELIMITER //
 
 CREATE PROCEDURE AddBonus(IN user_id INT, IN project_name VARCHAR(255), IN score INT)
