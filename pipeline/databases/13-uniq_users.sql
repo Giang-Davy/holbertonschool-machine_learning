@@ -1,2 +1,2 @@
 -- Creer une table users
-CREATE TABLE IF NOT EXISTS users(id int, email VARCHAR(256), name VARCHAR(256));
+CREATE TABLE IF NOT EXISTS users(id int NOT NULL PRIMARY KEY, email VARCHAR(255) NOT NULL UNIQUE, name VARCHAR(255));
