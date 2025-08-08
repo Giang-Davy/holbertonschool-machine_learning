@@ -1,2 +1,2 @@
--- Affiche la liste des bases de donnees
+// Affiche la liste des bases de donnees 
 show dbs
