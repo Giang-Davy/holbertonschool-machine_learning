@@ -1,2 +1,5 @@
 //Mettre À jour un documents
-db.school0.update({ adress : '972 Mission street'})
+db.school.updateMany(
+	{ name: "Holberton school" },
+	{ $set: { address: "972 Mission street" } }
+)
