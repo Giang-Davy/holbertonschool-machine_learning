@@ -1,0 +1,2 @@
+//Mettre À jour un documents
+db.school0.update({ adress : '972 Mission street'})
