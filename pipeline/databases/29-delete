@@ -1,2 +1,2 @@
 // suprimme les documents avec le nom de Holberton school
-db.school.removeMany({name : "Holberton school"})
+db.school.deleteMany({name : "Holberton school"})
