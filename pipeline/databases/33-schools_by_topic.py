@@ -4,4 +4,4 @@
 
 def schools_by_topic(mongo_collection, topic):
     """retourne une liste avec un sujet prÉcis"""
-	return list(mongo_collection.find({"topics": topic}))
+    return list(mongo_collection.find({"topics": topic}))
