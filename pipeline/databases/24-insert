@@ -1,2 +1,2 @@
 // Insertion d'une base de donee
-db.school.insertOne({name : "Holberton school"}) 
+db.school.insertOne({name : "Holberton school"}); 
