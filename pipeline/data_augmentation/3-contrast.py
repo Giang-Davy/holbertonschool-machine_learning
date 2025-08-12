@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""2-rotate.py"""
+"""3-contrast.py"""
 
 
 import tensorflow as tf
